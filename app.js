@@ -70,11 +70,23 @@ app.get(
   authentication.isLoggedOut,
   authentication.validateUser
 );
-
-app.get("/reset/:token", authentication.setNewPassword);
-// posts route
-
 //
+app.get(
+  "/reset/:token",
+  authentication.isValidToken,
+  authentication.isLoggedOut,
+  authentication.setNewPassword
+);
+//
+app
+  .route("/password/:token")
+  .all(authentication.isValidToken, authentication.isLoggedOut)
+  .get((req, res) => {
+    res.render("setPassword", { url: `${req.params.token}` });
+  })
+  .post(authentication.updatePassword);
+
+// posts route
 app.use("*", (req, res) => res.redirect("/"));
 // Exporting the app
 module.exports = app;

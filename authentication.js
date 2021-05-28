@@ -13,6 +13,14 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+module.exports.isValidToken = async (req, res, next) => {
+  const user = await User.findOne({ tokenString: req.params.token });
+
+  if (user == null || !user.tokenIsValid) return res.redirect(301, "/login");
+
+  next();
+};
+
 module.exports.isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) return next();
   res.redirect(301, "/login");
@@ -56,18 +64,23 @@ module.exports.signup = async (req, res) => {
     const create_user = {
       firstName: req.body.firstName,
       lastName: req.body.lastName,
+
       password: hashed_password,
       email: req.body.email,
       isVerified: false,
-      updateToken: uniqueString(),
+
+      tokenString: uniqueString(),
       tokenTime: new Date(),
-      followers: [],
+      tokenIsValid: true,
+
       following: [],
+      followers: [],
+      posts: [],
     };
 
-    // If errors exist, prompting for input again
+    // If errors exist, prompting for input again // Fix thiss
     if (err.length > 0) {
-      return res.render(200, "register", {
+      return res.render("register", {
         err,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
@@ -86,7 +99,7 @@ module.exports.signup = async (req, res) => {
       to: `${create_user.email}`,
       subject: "Verify Email Address",
       text: `Hi ${create_user.firstName} ${create_user.lastName}, welcome to the community from the developers!!
-          Paste the following link in your browser to verify your account: localhost:5000/validate/${create_user.updateToken}`,
+          Paste the following link in your browser to verify your account: localhost:5000/validate/${create_user.tokenString}`,
     };
 
     transporter.sendMail(emailConfig, function (error, info) {
@@ -145,25 +158,38 @@ module.exports.logOut = (req, res) => {
 };
 
 module.exports.validateUser = async (req, res) => {
-  const user = await User.findOne({ updateToken: req.params.token });
+  const user = await User.findOne({ tokenString: req.params.token });
   const time = new Date();
 
   if (user == null) return res.send("Invalid link");
+  if (!user.tokenIsValid) return res.send("Invalid Token");
+  if (user.isVerified) return res.redirect("/login");
 
-  if (
-    time.getHours() - user.tokenTime.getHours() > 1 ||
-    time.getMinutes() - user.tokenTime.getMinutes() > 59
-  )
-    return res.send("Verification link has expired");
-
-  await User.updateOne({ email: user.email }, { $set: { isVerified: true } });
+  await User.updateOne(
+    { email: user.email },
+    { $set: { isVerified: true, tokenIsValid: false } }
+  );
 
   return res.redirect(301, "/login");
 };
 
 module.exports.setNewPassword = async (req, res) => {
-  const user = User.findOne({ updateToken: req.params.token });
-  res.send(user);
+  res.redirect(`/password/${req.params.token}`);
+};
+
+module.exports.updatePassword = async (req, res) => {
+  if (req.body.password != req.body.password2)
+    return res.send("Both passwords must match!!");
+
+  const salt = await bcrypt.genSalt();
+  const hashed_password = await bcrypt.hash(req.body.password, salt);
+
+  await User.updateOne(
+    { tokenString: req.params.token },
+    { $set: { password: hashed_password, tokenIsValid: false } }
+  );
+
+  return res.send("Password updated!!");
 };
 
 module.exports.reset = async (req, res) => {
@@ -171,10 +197,12 @@ module.exports.reset = async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
   const token = uniqueString();
 
-  if (user == null) return res.send("No such email");
+  if (user == null) return res.send("No user exists for the email");
+  if (!user.isVerified)
+    return res.send("User has to be verified before you can reset password!!");
 
   await User.updateOne({
-    $set: { tokenTime: new Date(), updateToken: token },
+    $set: { tokenTime: new Date(), tokenString: token, tokenIsValid: true },
   });
 
   // turn into a class
@@ -183,7 +211,7 @@ module.exports.reset = async (req, res) => {
     to: `${user.email}`,
     subject: "Verify Email Address",
     text: `Hi ${user.firstName} ${user.lastName}, your (or someone else) has requested password reset for this account!!
-          Paste the following link in your browser to reset your password: localhost:5000/validate/${token}`,
+          Paste the following link in your browser to reset your password: localhost:5000/reset/${token}`,
   };
 
   transporter.sendMail(emailConfig, function (error, info) {
