@@ -102,7 +102,7 @@ module.exports.signup = async (req, res) => {
       to: `${create_user.email}`,
       subject: "Verify Email Address",
       text: `Hi ${create_user.firstName} ${create_user.lastName}, welcome to the community from the developers!!
-          Paste the following link in your browser to verify your account: ${process.env.DOMAIN}/validate/${create_user.tokenString}`,
+          Paste the following link in your browser to verify your account: ${process.env.DOMAIN}validate/${create_user.tokenString}`,
     };
 
     transporter.sendMail(emailConfig, function (error, info) {
@@ -234,7 +234,7 @@ module.exports.reset = async (req, res) => {
     to: `${user.email}`,
     subject: "Verify Email Address",
     text: `Hi ${user.firstName} ${user.lastName}, your (or someone else) has requested password reset for this account!!
-          Paste the following link in your browser to reset your password: ${process.env.DOMAIN}/reset/${token}`,
+          Paste the following link in your browser to reset your password: ${process.env.DOMAIN}reset/${token}`,
   };
 
   transporter.sendMail(emailConfig, function (error, info) {
