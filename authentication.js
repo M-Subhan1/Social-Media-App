@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 });
 
 module.exports.isValidToken = async (req, res, next) => {
-  const user = await User.findOne({ tokenString: req.params.token });
+  const user = await User.findOne({ tokenString: req.params.token.trim() });
 
   if (user == null || !user.tokenIsValid) {
     req.flash("info", "The link has expired!!");
@@ -53,7 +53,7 @@ module.exports.signup = async (req, res) => {
       err.push({ message: "Passwords do not match!" });
 
     const user = await User.findOne({
-      email: req.body.email,
+      email: req.body.email.trim(),
     });
 
     if (user != null)
@@ -64,17 +64,14 @@ module.exports.signup = async (req, res) => {
 
     // Turn into a class
     const create_user = {
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-
+      firstName: req.body.firstName.trim(),
+      lastName: req.body.lastName.trim(),
       password: hashed_password,
-      email: req.body.email,
+      email: req.body.email.trim(),
       isVerified: false,
-
       tokenString: uniqueString(),
       tokenTime: new Date(),
       tokenIsValid: true,
-
       following: [],
       followers: [],
       posts: [],
@@ -162,7 +159,7 @@ module.exports.logOut = (req, res) => {
 };
 
 module.exports.validateUser = async (req, res) => {
-  const user = await User.findOne({ tokenString: req.params.token });
+  const user = await User.findOne({ tokenString: req.params.token.trim() });
   const time = new Date();
 
   if (user == null || !user.tokenIsValid || user.isVerified) {
@@ -192,14 +189,18 @@ module.exports.updatePassword = async (req, res) => {
     return res.redirect(`/reset/${req.params.token}`);
   }
 
+  if (req.body.password < 6) {
+    req.flash("warning", "Password must be greater than 6 characters");
+    return res.redirect(`/reset/${req.params.token}`);
+  }
+
   const salt = await bcrypt.genSalt();
   const hashed_password = await bcrypt.hash(req.body.password, salt);
-  const user = await User.updateOne(
-    { tokenString: req.params.token },
+  await User.updateOne(
+    { tokenString: req.params.token.trim() },
     { $set: { password: hashed_password, tokenIsValid: true } }
   );
 
-  console.log(user);
   req.flash("message", "Password updated!!");
   return res.redirect("/login");
 };
@@ -207,7 +208,7 @@ module.exports.updatePassword = async (req, res) => {
 module.exports.reset = async (req, res) => {
   let err = [];
 
-  const user = await User.findOne({ email: req.body.email });
+  const user = await User.findOne({ email: req.body.email.trim() });
   const token = uniqueString();
 
   if (user == null) {
@@ -224,7 +225,7 @@ module.exports.reset = async (req, res) => {
   }
 
   await User.updateOne(
-    { email: req.body.email },
+    { email: req.body.email.trim() },
     {
       $set: { tokenTime: new Date(), tokenString: token, tokenIsValid: true },
     }

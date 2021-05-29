@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 
 const authentication = require("./authentication");
 const userRouter = require("./routes/users");
+const postRouter = require("./routes/posts");
 
 authentication.configure(passport);
 
@@ -42,6 +43,10 @@ app
   .all(authentication.isLoggedIn)
   .get((req, res) => res.render("dashboard", { name: req.user.firstName }));
 
+// Users Roue
+app.use("/users", authentication.isLoggedIn, userRouter);
+// Posts Route
+app.use("/posts", authentication.isLoggedIn, postsRouter);
 // login route
 app
   .route("/login")
@@ -71,7 +76,6 @@ app.post("/logout", authentication.isLoggedIn, authentication.logOut);
 app.get("/reset", (req, res) => res.render("reset"));
 app.post("/reset", authentication.reset);
 // Users route
-app.use("/users", authentication.isLoggedIn, userRouter);
 app.get(
   "/validate/:token",
   authentication.isLoggedOut,
