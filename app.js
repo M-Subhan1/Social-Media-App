@@ -60,7 +60,7 @@ app
     })
   );
 
-// Reigster route
+// Reigster route and password resets
 app
   .route("/register")
   .all(authentication.isLoggedOut)
