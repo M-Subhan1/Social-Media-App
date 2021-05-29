@@ -227,13 +227,14 @@ module.exports.reset = async (req, res) => {
     $set: { tokenTime: new Date(), tokenString: token, tokenIsValid: true },
   });
 
+  const domain = process.env.DOMAIN || "localhost:5000/";
   // turn into a class
   const emailConfig = {
     from: `${process.env.EMAIL}`,
     to: `${user.email}`,
     subject: "Reset Password",
     text: `Hi ${user.firstName} ${user.lastName}, your (or someone else) has requested password reset for this account!!
-          Paste the following link in your browser to reset your password: ${process.env.DOMAIN}reset/${token}`,
+          Paste the following link in your browser to reset your password: ${domain}reset/${token}`,
   };
 
   transporter.sendMail(emailConfig, function (error, info) {
