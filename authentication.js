@@ -194,12 +194,12 @@ module.exports.updatePassword = async (req, res) => {
 
   const salt = await bcrypt.genSalt();
   const hashed_password = await bcrypt.hash(req.body.password, salt);
-
-  await User.updateOne(
+  const user = await User.updateOne(
     { tokenString: req.params.token },
-    { $set: { password: hashed_password, tokenIsValid: false } }
+    { $set: { password: hashed_password, tokenIsValid: true } }
   );
 
+  console.log(user);
   req.flash("message", "Password updated!!");
   return res.redirect("/login");
 };
@@ -223,9 +223,12 @@ module.exports.reset = async (req, res) => {
     return res.render("reset", { err });
   }
 
-  await User.updateOne({
-    $set: { tokenTime: new Date(), tokenString: token, tokenIsValid: true },
-  });
+  await User.updateOne(
+    { email: req.body.email },
+    {
+      $set: { tokenTime: new Date(), tokenString: token, tokenIsValid: true },
+    }
+  );
 
   const domain = process.env.DOMAIN || "localhost:5000/";
   // turn into a class
