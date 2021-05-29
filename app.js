@@ -40,7 +40,7 @@ app.set("view engine", "ejs");
 app
   .route("/")
   .all(authentication.isLoggedIn)
-  .get((req, res) => res.render("index", { name: req.user.firstName }));
+  .get((req, res) => res.render("dashboard", { name: req.user.firstName }));
 
 // login route
 app

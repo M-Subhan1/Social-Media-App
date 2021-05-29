@@ -94,14 +94,14 @@ module.exports.signup = async (req, res) => {
 
     // Creating the user if there are no errors
     const new_user = await User.create(create_user);
-
+    const domain = process.env.DOMAIN || "localhost:5000/";
     // Turn into a class
     const emailConfig = {
       from: `${process.env.EMAIL}`,
       to: `${create_user.email}`,
       subject: "Verify Email Address",
       text: `Hi ${create_user.firstName} ${create_user.lastName}, welcome to the community from the developers!!
-          Paste the following link in your browser to verify your account: ${process.env.DOMAIN}validate/${create_user.tokenString}`,
+          Paste the following link in your browser to verify your account: ${domain}validate/${create_user.tokenString}`,
     };
 
     transporter.sendMail(emailConfig, function (error, info) {
