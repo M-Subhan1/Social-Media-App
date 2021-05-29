@@ -3,11 +3,41 @@
     <div class="card card-body">
       <h1 class="text-center mb-3"><i class="fas fa-sign-in-alt"></i> Login</h1>
       <% if (messages.error != null) { %>
-      <div class="alert alert-warning" role="alert"><%= messages.error %></div>
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <%= messages.error %>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="alert"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
       <% } %> <% if (message != '') { %>
-      <div class="alert alert-success" role="alert"><%= message %></div>
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <%= message %>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="alert"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
       <% } %> <% if (info != '') { %>
-      <div class="alert alert-info" role="alert"><%= info %></div>
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <%= info %>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="alert"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
       <% } %>
 
       <form action="/login" method="POST">

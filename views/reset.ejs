@@ -3,7 +3,17 @@
     <div class="card card-body">
       <h1 class="text-center mb-3"><i class="fas fa-sign-in-alt"></i> Reset</h1>
       <% if (typeof err != "undefined") { %> <% err.forEach(function(err) { %>
-      <div class="alert alert-warning" role="alert"><%=err.message %></div>
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <%=err.message %>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="alert"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
       <% }); %> <% } %>
       <form method="POST" action="/reset">
         <div class="form-group">
@@ -15,6 +25,7 @@
             class="form-control"
             placeholder="Enter Email"
             value="<%= typeof email != 'undefined' ? email : '' %>"
+            required
           />
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>

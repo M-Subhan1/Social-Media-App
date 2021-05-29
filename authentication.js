@@ -25,7 +25,6 @@ module.exports.isValidToken = async (req, res, next) => {
 
 module.exports.isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) return next();
-  req.flash("info", "You are not logged in! Kindly login");
   res.redirect(301, "/login");
 };
 
@@ -232,7 +231,7 @@ module.exports.reset = async (req, res) => {
   const emailConfig = {
     from: `${process.env.EMAIL}`,
     to: `${user.email}`,
-    subject: "Verify Email Address",
+    subject: "Reset Password",
     text: `Hi ${user.firstName} ${user.lastName}, your (or someone else) has requested password reset for this account!!
           Paste the following link in your browser to reset your password: ${process.env.DOMAIN}reset/${token}`,
   };
@@ -246,9 +245,6 @@ module.exports.reset = async (req, res) => {
     }
   });
 
-  req.flash(
-    "message",
-    "Password updated! You can now log in with your new password."
-  );
+  req.flash("message", "Check your email for password reset instructions");
   res.redirect("/login");
 };

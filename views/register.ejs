@@ -6,7 +6,17 @@
       </h1>
 
       <% if (typeof err != "undefined") { %> <% err.forEach(function(err) { %>
-      <div class="alert alert-warning" role="alert"><%=err.message %></div>
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <%=err.message %>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="alert"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
       <% }); %> <% } %>
       <form action="/register" method="POST">
         <div class="form-group">
