@@ -1,14 +1,28 @@
-<form method="POST" action="/reset" class="mt-auto ml-auto">
-  <div class="form-group">
-    <label for="email">Email</label>
-    <input
-      type="email"
-      id="email"
-      name="email"
-      class="form-control"
-      placeholder="Enter Email"
-      value="<%= typeof email != 'undefined' ? email : '' %>"
-    />
+<div class="row mt-5">
+  <div class="col-md-6 m-auto">
+    <div class="card card-body">
+      <h1 class="text-center mb-3"><i class="fas fa-sign-in-alt"></i> Reset</h1>
+      <% if (typeof err != "undefined") { %> <% err.forEach(function(err) { %>
+      <div class="alert alert-warning" role="alert"><%=err.message %></div>
+      <% }); %> <% } %>
+      <form method="POST" action="/reset">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            class="form-control"
+            placeholder="Enter Email"
+            value="<%= typeof email != 'undefined' ? email : '' %>"
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+      <p class="lead mt-4">
+        No Account? <a href="/register">Register </a>Have an account?
+        <a href="/login">Login</a>
+      </p>
+    </div>
   </div>
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+</div>

@@ -16,13 +16,16 @@ const transporter = nodemailer.createTransport({
 module.exports.isValidToken = async (req, res, next) => {
   const user = await User.findOne({ tokenString: req.params.token });
 
-  if (user == null || !user.tokenIsValid) return res.redirect(301, "/login");
-
+  if (user == null || !user.tokenIsValid) {
+    req.flash("info", "The link has expired!!");
+    return res.redirect(301, "/login");
+  }
   next();
 };
 
 module.exports.isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) return next();
+  req.flash("info", "You are not logged in! Kindly login");
   res.redirect(301, "/login");
 };
 
@@ -112,6 +115,7 @@ module.exports.signup = async (req, res) => {
     });
 
     // Add redirect to login page
+    req.flash("message", "Account created!! Verify your email to login");
     res.redirect(301, "/login");
   } catch (err) {
     res.status(500).json({
@@ -154,6 +158,7 @@ module.exports.configure = passport => {
 
 module.exports.logOut = (req, res) => {
   req.logOut();
+  req.flash("message", "Successfully Logged out!");
   res.redirect(301, "/login");
 };
 
@@ -161,25 +166,32 @@ module.exports.validateUser = async (req, res) => {
   const user = await User.findOne({ tokenString: req.params.token });
   const time = new Date();
 
-  if (user == null) return res.send("Invalid link");
-  if (!user.tokenIsValid) return res.send("Invalid Token");
-  if (user.isVerified) return res.redirect("/login");
+  if (user == null || !user.tokenIsValid || user.isVerified) {
+    req.flash("info", "Invalid link");
+    return res.redirect("/login");
+  }
 
   await User.updateOne(
     { email: user.email },
     { $set: { isVerified: true, tokenIsValid: false } }
   );
 
+  req.flash("message", "Account Verified!! You can now login");
   return res.redirect(301, "/login");
 };
 
 module.exports.setNewPassword = async (req, res) => {
-  res.redirect(`/password/${req.params.token}`);
+  res.render("setPassword", {
+    url: `/password/${req.params.token}`,
+    warning: req.flash("warning"),
+  });
 };
 
 module.exports.updatePassword = async (req, res) => {
-  if (req.body.password != req.body.password2)
-    return res.send("Both passwords must match!!");
+  if (req.body.password != req.body.password2) {
+    req.flash("warning", "Both passwords must match!!");
+    return res.redirect(`/reset/${req.params.token}`);
+  }
 
   const salt = await bcrypt.genSalt();
   const hashed_password = await bcrypt.hash(req.body.password, salt);
@@ -189,17 +201,28 @@ module.exports.updatePassword = async (req, res) => {
     { $set: { password: hashed_password, tokenIsValid: false } }
   );
 
-  return res.send("Password updated!!");
+  req.flash("message", "Password updated!!");
+  return res.redirect("/login");
 };
 
 module.exports.reset = async (req, res) => {
-  //
+  let err = [];
+
   const user = await User.findOne({ email: req.body.email });
   const token = uniqueString();
 
-  if (user == null) return res.send("No user exists for the email");
-  if (!user.isVerified)
-    return res.send("User has to be verified before you can reset password!!");
+  if (user == null) {
+    err.push({ message: "No user exists for the email" });
+    return res.render("reset", { err });
+  }
+
+  if (!user.isVerified) {
+    err.push({
+      message: "User has to be verified before you can reset password!!",
+    });
+
+    return res.render("reset", { err });
+  }
 
   await User.updateOne({
     $set: { tokenTime: new Date(), tokenString: token, tokenIsValid: true },
@@ -223,5 +246,9 @@ module.exports.reset = async (req, res) => {
     }
   });
 
-  res.send("Email sent!! check your email");
+  req.flash(
+    "message",
+    "Password updated! You can now log in with your new password."
+  );
+  res.redirect("/login");
 };

@@ -4,6 +4,7 @@ const expressLayouts = require("express-ejs-layouts");
 const passport = require("passport");
 const flash = require("express-flash");
 const session = require("express-session");
+const cookieParser = require("cookie-parser");
 
 const authentication = require("./authentication");
 const userRouter = require("./routes/users");
@@ -14,18 +15,19 @@ authentication.configure(passport);
 const app = express();
 
 // Passport middleware
-app.use(flash());
 app.use(
   session({
     secret: "secret",
     resave: false,
     saveUninitialized: false,
+    cookie: { maxAge: 60000 },
   })
 );
 
 app.use(passport.initialize());
+app.use(cookieParser("secret abc"));
 app.use(passport.session());
-
+app.use(flash());
 // Middlewares
 if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 
@@ -44,7 +46,12 @@ app
 app
   .route("/login")
   .all(authentication.isLoggedOut)
-  .get((req, res) => res.render("login"))
+  .get((req, res) =>
+    res.render("login", {
+      message: req.flash("message"),
+      info: req.flash("info"),
+    })
+  )
   .post(
     passport.authenticate("local", {
       successRedirect: "/",
@@ -78,13 +85,12 @@ app.get(
   authentication.setNewPassword
 );
 //
-app
-  .route("/password/:token")
-  .all(authentication.isValidToken, authentication.isLoggedOut)
-  .get((req, res) => {
-    res.render("setPassword", { url: `${req.params.token}` });
-  })
-  .post(authentication.updatePassword);
+app.post(
+  "/password/:token",
+  authentication.isValidToken,
+  authentication.isLoggedOut,
+  authentication.updatePassword
+);
 
 // posts route
 app.use("*", (req, res) => res.redirect("/"));
