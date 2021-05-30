@@ -5,8 +5,8 @@ const userController = require("../controllers/userController");
 
 // router.get("/register", userController.register);
 router.get("/find/:email", userController.findUser);
-router.get("/follow/:email", userController.follow);
-router.get("/unfollow/:email", userController.unfollow);
+router.get("/follow/:id", userController.follow);
+router.get("/unfollow/:id", userController.unfollow);
 
 module.exports = router;
 

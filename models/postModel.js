@@ -2,9 +2,21 @@ const mongoose = require("mongoose");
 
 const commentSchema = new mongoose.Schema({
   author: {
-    type: String,
-    required: [true, "Comments must have an author"],
-    trim: true,
+    firstName: {
+      type: String,
+      required: [true, "Comment Author must have a firstname"],
+      trim: true,
+    },
+    lastName: {
+      type: String,
+      required: [true, "Comment Author must have a lastname"],
+      trim: true,
+    },
+    id: {
+      type: String,
+      required: [true, "Comment Author must have an id"],
+      trim: true,
+    },
   },
   text: {
     type: String,
@@ -15,10 +27,23 @@ const commentSchema = new mongoose.Schema({
 
 const postSchema = new mongoose.Schema({
   author: {
-    type: String,
-    required: [true, "Post Must have an author"],
-    trim: true,
+    firstName: {
+      type: String,
+      required: [true, "Comment Author must have a firstname"],
+      trim: true,
+    },
+    lastName: {
+      type: String,
+      required: [true, "Comment Author must have a lastname"],
+      trim: true,
+    },
+    id: {
+      type: String,
+      required: [true, "Comment Author must have an id"],
+      trim: true,
+    },
   },
+
   content: {
     type: String,
     required: [true, "Post Must have some content"],

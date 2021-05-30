@@ -5,6 +5,7 @@ const nodemailer = require("nodemailer");
 const LocalStrategy = require("passport-local").Strategy;
 const User = require("./models/userModels");
 
+// Configuring transporter for nodemailer
 const transporter = nodemailer.createTransport({
   service: "hotmail",
   auth: {
@@ -13,8 +14,9 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Checks if the token string is valid
 module.exports.isValidToken = async (req, res, next) => {
-  const user = await User.findOne({ tokenString: req.params.token.trim() });
+  const user = await User.findOne({ tokenString: req.params.token });
 
   if (user == null || !user.tokenIsValid) {
     req.flash("info", "The link has expired!!");
@@ -22,17 +24,17 @@ module.exports.isValidToken = async (req, res, next) => {
   }
   next();
 };
-
+// Checks if the user is logged out, else redirects to login
 module.exports.isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) return next();
   res.redirect(301, "/login");
 };
-
+// Checks if the user is logged out, else redirects to /
 module.exports.isLoggedOut = (req, res, next) => {
   if (!req.isAuthenticated()) return next();
   res.redirect(301, "/", { name: req.user.firstName });
 };
-
+// Validates data Signups the user
 module.exports.signup = async (req, res) => {
   try {
     let err = [];
@@ -53,7 +55,7 @@ module.exports.signup = async (req, res) => {
       err.push({ message: "Passwords do not match!" });
 
     const user = await User.findOne({
-      email: req.body.email.trim(),
+      email: req.body.email,
     });
 
     if (user != null)
@@ -64,10 +66,10 @@ module.exports.signup = async (req, res) => {
 
     // Turn into a class
     const create_user = {
-      firstName: req.body.firstName.trim(),
-      lastName: req.body.lastName.trim(),
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
       password: hashed_password,
-      email: req.body.email.trim(),
+      email: req.body.email,
       isVerified: false,
       tokenString: uniqueString(),
       tokenTime: new Date(),
@@ -80,6 +82,7 @@ module.exports.signup = async (req, res) => {
     // If errors exist, prompting for input again // Fix thiss
     if (err.length > 0) {
       return res.render("register", {
+        title: "Register",
         err,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
@@ -119,7 +122,7 @@ module.exports.signup = async (req, res) => {
     });
   }
 };
-
+// Password Configuration
 module.exports.configure = passport => {
   const authenticateUser = async (email, password, done) => {
     try {
@@ -151,15 +154,15 @@ module.exports.configure = passport => {
     return done(null, user);
   });
 };
-
+// Logs the user out
 module.exports.logOut = (req, res) => {
   req.logOut();
   req.flash("message", "Successfully Logged out!");
   res.redirect(301, "/login");
 };
-
+// Validates login
 module.exports.validateUser = async (req, res) => {
-  const user = await User.findOne({ tokenString: req.params.token.trim() });
+  const user = await User.findOne({ tokenString: req.params.token });
   const time = new Date();
 
   if (user == null || !user.tokenIsValid || user.isVerified) {
@@ -175,21 +178,22 @@ module.exports.validateUser = async (req, res) => {
   req.flash("message", "Account Verified!! You can now login");
   return res.redirect(301, "/login");
 };
-
+// Renders the Password Prompt webpage
 module.exports.setNewPassword = async (req, res) => {
   res.render("setPassword", {
+    title: "Password Reset",
     url: `/password/${req.params.token}`,
     warning: req.flash("warning"),
   });
 };
-
+// Validates and stores password update
 module.exports.updatePassword = async (req, res) => {
   if (req.body.password != req.body.password2) {
     req.flash("warning", "Both passwords must match!!");
     return res.redirect(`/reset/${req.params.token}`);
   }
 
-  if (req.body.password < 6) {
+  if (req.body.password.length < 6) {
     req.flash("warning", "Password must be greater than 6 characters");
     return res.redirect(`/reset/${req.params.token}`);
   }
@@ -204,16 +208,16 @@ module.exports.updatePassword = async (req, res) => {
   req.flash("message", "Password updated!!");
   return res.redirect("/login");
 };
-
+// Sends Password Reset Emails
 module.exports.reset = async (req, res) => {
   let err = [];
 
-  const user = await User.findOne({ email: req.body.email.trim() });
+  const user = await User.findOne({ email: req.body.email });
   const token = uniqueString();
 
   if (user == null) {
     err.push({ message: "No user exists for the email" });
-    return res.render("reset", { err });
+    return res.render("reset", { title: "Password Reset", err });
   }
 
   if (!user.isVerified) {
@@ -221,11 +225,11 @@ module.exports.reset = async (req, res) => {
       message: "User has to be verified before you can reset password!!",
     });
 
-    return res.render("reset", { err });
+    return res.render("reset", { title: "Password Reset", err });
   }
 
   await User.updateOne(
-    { email: req.body.email.trim() },
+    { email: req.body.email },
     {
       $set: { tokenTime: new Date(), tokenString: token, tokenIsValid: true },
     }

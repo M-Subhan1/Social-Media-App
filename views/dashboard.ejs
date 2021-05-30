@@ -1,4 +1,56 @@
-<h1>HI <%= name == "undefined" ? '' : name %></h1>
-<form method="POST" action="/logout">
-  <button type="submit">Logout</button>
+<link href="css/post.css" rel="stylesheet" />
+<form method="POST" action="/posts">
+  <textarea name="content" id="content"> </textarea>
+  <button type="submit">Post</button>
 </form>
+
+<% posts.forEach(function(post) { %>
+<div class="container">
+  <div class="row">
+    <div class="col-md-8">
+      <div class="post-content">
+        <div class="post-container">
+          <img
+            src="https://bootdey.com/img/Content/avatar/avatar6.png"
+            alt="user"
+            class="profile-photo-md pull-left"
+          />
+          <div class="post-detail">
+            <div class="user-info">
+              <h5>
+                <a href="timeline.html" class="profile-link"
+                  ><%= post.author.firstName%> <%= post.author.lastName%></a
+                >
+                <!-- <span class="following">following</span> -->
+              </h5>
+              <!-- <p class="text-muted"></p> -->
+            </div>
+            <!-- <div class="reaction">
+              <a class="btn text-green"><i class="fa fa-thumbs-up"></i> 13</a>
+              <a class="btn text-red"><i class="fa fa-thumbs-down"></i> 0</a>
+            </div> -->
+            <div class="line-divider"></div>
+            <div class="post-text">
+              <p>
+                <%= post.content%>
+                <i class="em em-anguished"></i> <i class="em em-anguished"></i>
+                <i class="em em-anguished"></i>
+              </p>
+            </div>
+            <div class="line-divider"></div>
+            <% post.comments.forEach(function(comment) {%>
+            <h6><%=comment.author.firstName%> <%= comment.author.lastName%></h6>
+            <p><%=comment.text%></p>
+            <% }); %>
+            <form method="POST" action="<%= `/posts/comment/${post._id}`%>">
+              <textarea name="text" id="text"> </textarea>
+              <button type="submit">Comment</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% }); %>

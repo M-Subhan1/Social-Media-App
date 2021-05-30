@@ -7,15 +7,16 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 
 const authentication = require("./authentication");
+const dashboard = require("./dashboard");
 const userRouter = require("./routes/users");
 const postRouter = require("./routes/posts");
 
+// Configuring Passport
 authentication.configure(passport);
-
 // Creating an app object (instance of express class)
 const app = express();
 
-// Passport middleware
+// Setting Up Passport
 app.use(
   session({
     secret: "secret",
@@ -24,35 +25,37 @@ app.use(
     cookie: { maxAge: 60000 },
   })
 );
-
 app.use(passport.initialize());
 app.use(cookieParser("secret abc"));
 app.use(passport.session());
 app.use(flash());
 // Middlewares
 if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
-
+// Parsing Request data
 app.use(express.json());
 app.use(express.urlencoded({ entended: true }));
-app.use(express.static(__dirname + "/public"));
+// Setting and confuguring view engine
+app.set("layout", "./layouts/layout");
 app.use(expressLayouts);
 app.set("view engine", "ejs");
+// Setting static directories
+app.use(express.static("public"));
+app.use("/css", express.static(__dirname + "public/css"));
+app.use("/js", express.static(__dirname + "public/js"));
 
-app
-  .route("/")
-  .all(authentication.isLoggedIn)
-  .get((req, res) => res.render("dashboard", { name: req.user.firstName }));
+app.route("/").all(authentication.isLoggedIn).get(dashboard.populate);
 
-// Users Roue
+// Users Router
 app.use("/users", authentication.isLoggedIn, userRouter);
 // Posts Route
-app.use("/posts", authentication.isLoggedIn, postsRouter);
+app.use("/posts", authentication.isLoggedIn, postRouter);
 // login route
 app
   .route("/login")
   .all(authentication.isLoggedOut)
   .get((req, res) =>
     res.render("login", {
+      title: "Login",
       message: req.flash("message"),
       info: req.flash("info"),
     })
@@ -69,11 +72,11 @@ app
 app
   .route("/register")
   .all(authentication.isLoggedOut)
-  .get((req, res) => res.render("register"))
+  .get((req, res) => res.render("register", { title: "Register" }))
   .post(authentication.signup);
 
 app.post("/logout", authentication.isLoggedIn, authentication.logOut);
-app.get("/reset", (req, res) => res.render("reset"));
+app.get("/reset", (req, res) => res.render("reset", { title: "Reset" }));
 app.post("/reset", authentication.reset);
 // Users route
 app.get(
@@ -97,6 +100,6 @@ app.post(
 );
 
 // posts route
-app.use("*", (req, res) => res.redirect("/"));
+app.use("^[^.]+$|.(?!(css|js)$)([^.]+$)", (req, res) => res.redirect("/"));
 // Exporting the app
 module.exports = app;

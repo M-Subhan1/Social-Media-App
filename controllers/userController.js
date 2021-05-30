@@ -7,7 +7,6 @@ module.exports.update = (req, res) => {
 
 // find a user
 module.exports.findUser = async (req, res) => {
-  console.log(req.params);
   const user = await User.find({
     $or: [
       { email: req.params.email },
@@ -17,74 +16,65 @@ module.exports.findUser = async (req, res) => {
     ],
   });
 
-  return res.render("user", { users: user });
+  // return res.render("user", { users: user });
   res.json(user); // fix
 };
 
 // follow user
 module.exports.follow = async (req, res) => {
-  //
-  console.log(req.user.email, req.params.email);
-  if (req.user.email == req.params.email) return res.redirect("/");
-
-  const user = await User.findOne({ email: req.params.email });
+  // if trying to follow myself, redirect
+  if (req.user._id.toString() == req.params.id) return res.redirect("/");
   // the user who followed'
+  const user = await User.find({ _id: req.params.id });
 
-  console.log(req.user.following.find(email => user.email == email));
+  if (typeof user == "undefined") return res.redirect("/");
 
-  if (
-    typeof req.user.following.find(email => user.email == email) ==
-      "undefined" ||
-    req.user.following.find(email => user.email == email) == []
-  ) {
-    req.user.following.push(user.email);
-    user.followers.push(req.user.email);
-  } else return res.redirect("/");
+  const match = req.user.following.filter(id => {
+    return req.user.following == req.params.id;
+  });
 
-  console.log(req.user.following, user.followers);
+  console.log(match);
 
-  await User.updateOne(
-    { email: req.user.email },
-    {
-      $set: { following: req.user.following },
-    }
-  );
+  if (match.length == 0) {
+    await User.updateOne(
+      { _id: req.user._id },
+      {
+        $push: { following: req.params.id },
+      }
+    );
 
-  // // the user who got followed
-  await User.updateOne(
-    { email: req.params.email },
-    {
-      $set: { followers: user.followers },
-    }
-  );
+    // // the user who got followed
+    await User.updateOne(
+      { _id: req.params.id },
+      {
+        $push: { followers: req.user._id },
+      }
+    );
+    console.log("success");
+  }
 
   res.redirect("/");
 };
 
 // unfollow user
 module.exports.unfollow = async (req, res) => {
-  //
-  if (req.user.email == req.params.email) return res.redirect("/");
+  if (req.user._id.toString() == req.params.id) return res.redirect("/");
 
-  const user = await User.findOne({ email: req.params.email });
-  // can be made better
-  const following = req.user.following.filter(email => email != user.email);
-  const followers = user.followers.filter(email => email != req.user.email);
+  console.log("HEllo");
 
   await User.updateOne(
-    { email: req.user.email },
+    { _id: req.user._id },
     {
-      $set: { following: following },
+      $pull: { following: req.params.id },
     }
   );
 
-  // // the user who got followed
   await User.updateOne(
-    { email: req.params.email },
+    { _id: req.params.id },
     {
-      $set: { followers: followers },
+      $pull: { followers: req.user._id },
     }
   );
 
-  return res.redirect("/");
+  res.redirect("/");
 };
