@@ -8,10 +8,14 @@ module.exports.populate = async (req, res) => {
 
   queryObj.push({ "author.id": req.user._id });
   // Apply filter for last 1 day
+  const time = new Date();
   const posts = await Post.find({ $or: queryObj });
+  const filteredPosts = posts.filter(post => {
+    return post.time.getTime() - time.getTime() < 86400000;
+  });
 
   res.render("dashboard", {
-    posts,
+    posts: filteredPosts,
     layout: "./layouts/dashboard",
     name: req.user.firstName,
   });

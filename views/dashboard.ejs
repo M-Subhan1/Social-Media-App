@@ -1,8 +1,13 @@
 <link href="css/post.css" rel="stylesheet" />
-<form method="POST" action="/posts">
-  <textarea name="content" id="content"> </textarea>
-  <button type="submit">Post</button>
-</form>
+
+<div class="container mt-3 mb-5">
+  <form method="POST" class="" action="/posts">
+    <textarea class="form-control mb-2" name="content" id="content"> </textarea>
+    <div style="text-align: center">
+      <button type="submit" class="d-inline-block btn btn-primary">Post</button>
+    </div>
+  </form>
+</div>
 
 <% posts.forEach(function(post) { %>
 <div class="container">
@@ -42,11 +47,40 @@
             <h6><%=comment.author.firstName%> <%= comment.author.lastName%></h6>
             <p><%=comment.text%></p>
             <% }); %>
-            <form method="POST" action="<%= `/posts/comment/${post._id}`%>">
+            <!-- <form method="POST" action="<%= `/posts/comment/${post._id}`%>">
               <textarea name="text" id="text"> </textarea>
-              <button type="submit">Comment</button>
+              
             </form>
+             -->
           </div>
+
+          <!-- <a class="btn btn-primary" data-toggle="collapse" href="#commentCollapse" role="button" aria-expanded="false" aria-controls="commentCollapse">
+              Comment
+            </a> -->
+          <!-- <div class="collapse" id="commentCollapse"> -->
+          <div class="comment-content mt-3">
+            <div>
+              <div class="mb-3 container">
+                <form method="POST" action="<%= `/posts/comment/${post._id}`%>">
+                  <div class="mb-3 input-group">
+                    <textarea
+                      class="form-control custom-control"
+                      rows="3"
+                      style="resize: none"
+                      name="text"
+                    ></textarea>
+                    <button
+                      type="submit"
+                      class="input-group-addon btn btn-primary"
+                    >
+                      Post
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <!-- </div> -->
         </div>
       </div>
     </div>

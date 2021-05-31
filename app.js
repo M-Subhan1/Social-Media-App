@@ -10,7 +10,6 @@ const authentication = require("./authentication");
 const dashboard = require("./dashboard");
 const userRouter = require("./routes/users");
 const postRouter = require("./routes/posts");
-
 // Configuring Passport
 authentication.configure(passport);
 // Creating an app object (instance of express class)
@@ -44,13 +43,13 @@ app.use(express.static("public"));
 app.use("/css", express.static(__dirname + "public/css"));
 app.use("/js", express.static(__dirname + "public/js"));
 
-app.route("/").all(authentication.isLoggedIn).get(dashboard.populate);
-
 // Users Router
 app.use("/users", authentication.isLoggedIn, userRouter);
 // Posts Route
 app.use("/posts", authentication.isLoggedIn, postRouter);
-// login route
+// Dashboard
+app.route("/").all(authentication.isLoggedIn).get(dashboard.populate);
+// Authentication Routes
 app
   .route("/login")
   .all(authentication.isLoggedOut)
@@ -100,7 +99,6 @@ app.post(
   authentication.updatePassword
 );
 
-// posts route
-app.use("^[^.]+$|.(?!(css|js)$)([^.]+$)", (req, res) => res.redirect("/"));
+app.get("^[^.]+$|.(?!(css|js)$)([^.]+$)", (req, res) => res.redirect("/"));
 // Exporting the app
 module.exports = app;
