@@ -5,13 +5,13 @@ module.exports.profile = async (req, res) => {
 };
 
 module.exports.mine = async (req, res) => {
-  console.log("Hi");
   // Getting Posts
-  const posts = await Post.find({ "author.id": req.user._id });
+  const filteredPosts = await Post.find({ "author.id": req.user._id });
   // Sorting Posts
-  posts.sort((a, b) => b.time.getTime() - a.time.getTime());
+  filteredPosts.sort((a, b) => b.time.getTime() - a.time.getTime());
+
   res.render("dashboard", {
-    posts: posts,
+    posts: filteredPosts,
     layout: "./layouts/dashboard",
     name: req.user.firstName,
   });
