@@ -1,11 +1,10 @@
 const express = require("express");
 
-const authentication = require("../authentication");
+const authentication = require("../controllers/authController");
+const dashboard = require("../dashboard");
 const passport = require("passport");
 
 const router = express.Router();
-
-authentication.configure(passport);
 
 router.route("/").all(authentication.isLoggedIn).get(dashboard.populate);
 
@@ -34,7 +33,6 @@ router
   .get((req, res) => res.render("register", { title: "Register" }))
   .post(authentication.signup);
 
-router.get("/logout", authentication.isLoggedIn, authentication.logOut);
 router.get("/reset", (req, res) => res.render("reset", { title: "Reset" }));
 router.post("/reset", authentication.reset);
 // Users route
@@ -58,6 +56,6 @@ router.post(
   authentication.updatePassword
 );
 
-router.get("^[^.]+$|.(?!(css|js)$)([^.]+$)", (req, res) => res.redirect("/"));
+router.all("^[^.]+$|.(?!(css|js)$)([^.]+$)", (req, res) => res.redirect("/"));
 
 module.exports = router;

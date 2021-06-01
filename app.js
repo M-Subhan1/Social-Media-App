@@ -6,10 +6,10 @@ const flash = require("express-flash");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 
-const authentication = require("./authentication");
-const dashboard = require("./dashboard");
+const authentication = require("./controllers/authController");
 const userRouter = require("./routes/users");
 const postRouter = require("./routes/posts");
+const authRouter = require("./routes/auth");
 // Configuring Passport
 authentication.configure(passport);
 // Creating an app object (instance of express class)
@@ -40,64 +40,16 @@ app.use(expressLayouts);
 app.set("view engine", "ejs");
 // Setting static directories
 app.use(express.static("public"));
+
+app.post("/logout", authentication.isLoggedIn, authentication.logOut);
 app.use("/css", express.static(__dirname + "public/css"));
 app.use("/js", express.static(__dirname + "public/js"));
-
 // Users Router
 app.use("/users", authentication.isLoggedIn, userRouter);
 // Posts Route
 app.use("/posts", authentication.isLoggedIn, postRouter);
-// Dashboard
-app.route("/").all(authentication.isLoggedIn).get(dashboard.populate);
 // Authentication Routes
-app
-  .route("/login")
-  .all(authentication.isLoggedOut)
-  .get((req, res) =>
-    res.render("login", {
-      title: "Login",
-      message: req.flash("message"),
-      info: req.flash("info"),
-    })
-  )
-  .post(
-    passport.authenticate("local", {
-      successRedirect: "/",
-      failureRedirect: "/login",
-      failureFlash: true,
-    })
-  );
-
-// Reigster route and password resets
-app
-  .route("/register")
-  .all(authentication.isLoggedOut)
-  .get((req, res) => res.render("register", { title: "Register" }))
-  .post(authentication.signup);
-
-app.post("/logout", authentication.isLoggedIn, authentication.logOut);
-app.get("/reset", (req, res) => res.render("reset", { title: "Reset" }));
-app.post("/reset", authentication.reset);
-// Users route
-app.get(
-  "/validate/:token",
-  authentication.isLoggedOut,
-  authentication.validateUser
-);
-//
-app.get(
-  "/reset/:token",
-  authentication.isValidToken,
-  authentication.isLoggedOut,
-  authentication.setNewPassword
-);
-//
-app.post(
-  "/password/:token",
-  authentication.isValidToken,
-  authentication.isLoggedOut,
-  authentication.updatePassword
-);
+app.use("/", authRouter);
 
 app.get("^[^.]+$|.(?!(css|js)$)([^.]+$)", (req, res) => res.redirect("/"));
 // Exporting the app

@@ -9,10 +9,9 @@ module.exports.update = (req, res) => {
 module.exports.findUser = async (req, res) => {
   const user = await User.find({
     $or: [
-      { email: req.params.email },
-      { firstName: req.params.email },
-      { lastName: req.params.email },
-      { id: req.params.email },
+      { email: req.body.query },
+      { firstName: req.body.query },
+      { lastName: req.body.query },
     ],
   });
 

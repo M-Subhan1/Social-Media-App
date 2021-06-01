@@ -3,7 +3,7 @@ const uniqueString = require("unique-string");
 const nodemailer = require("nodemailer");
 
 const LocalStrategy = require("passport-local").Strategy;
-const User = require("./models/userModels");
+const User = require("../models/userModels");
 
 // Configuring transporter for nodemailer
 const transporter = nodemailer.createTransport({
@@ -156,9 +156,9 @@ module.exports.configure = passport => {
 };
 // Logs the user out
 module.exports.logOut = (req, res) => {
-  req.logOut();
-  req.flash("message", "Successfully Logged out!");
-  res.redirect(301, "/login");
+  req.logout();
+  req.flash("message", "Successfully Logged Out!!");
+  return res.redirect("/login");
 };
 // Validates login
 module.exports.validateUser = async (req, res) => {
