@@ -43,13 +43,13 @@
             </div> -->
             <div class="line-divider"></div>
             <div class="post-text">
-              <p>
+              <p class="post-content">
                 <%= post.content%>
                 <i class="em em-anguished"></i> <i class="em em-anguished"></i>
                 <i class="em em-anguished"></i>
               </p>
             </div>
-            <div class="line-divider"></div>
+            <div class="post-content line-divider"></div>
             <% post.comments.forEach(function(comment) {%>
             <h6><%=comment.author.firstName%> <%= comment.author.lastName%></h6>
             <p><%=comment.text%></p>

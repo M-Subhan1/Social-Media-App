@@ -15,6 +15,11 @@ textarea:focus {
 #post-publish {
   border-radius: 5px;
 }
+
+.comment-content {
+  height: auto;
+  word-wrap: normal;
+}
 /*==================================================
   Post Contents CSS
   ==================================================*/
