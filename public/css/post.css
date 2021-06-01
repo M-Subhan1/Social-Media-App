@@ -1,10 +1,19 @@
 textarea {
   resize: none;
+  box-shadow: none;
+}
+
+textarea:focus {
+  box-shadow: none;
 }
 
 .i-block {
   display: inline-block;
   width: 10rem;
+}
+
+#post-publish {
+  width: 30rem;
 }
 /*==================================================
   Post Contents CSS
