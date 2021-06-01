@@ -6,8 +6,8 @@ module.exports.update = (req, res) => {
 };
 
 // find a user
-module.exports.findUser = async (req, res) => {
-  const user = await User.find({
+module.exports.findUsers = async (req, res) => {
+  const users = await User.find({
     $or: [
       { email: req.body.query },
       { firstName: req.body.query },
@@ -15,8 +15,21 @@ module.exports.findUser = async (req, res) => {
     ],
   });
 
-  // return res.render("user", { users: user });
-  res.json(user); // fix
+  if (users.length < 3) {
+    const moreUsers = await User.find();
+    moreUsers.sort((a, b) => {
+      b.tokenTime.getTime() - a.tokenTime.getTime();
+    });
+
+    for (let i = users.length; i < 3; i++) users.push(moreUsers[i]);
+  }
+
+  if (users.length > 3) for (let i = users.length; i > 3; i--) users.pop();
+
+  res.render("searchUsers", {
+    title: "Proj",
+    users: users,
+  });
 };
 
 // follow user

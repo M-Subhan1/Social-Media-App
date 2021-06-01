@@ -14,6 +14,7 @@ textarea:focus {
 
 #post-publish {
   width: 30rem;
+  border-radius: 5px;
 }
 /*==================================================
   Post Contents CSS
@@ -21,6 +22,8 @@ textarea:focus {
 .btn-primary {
   background: #11101d;
   border-color: #11101d;
+  border-bottom-right-radius: 4px;
+  border-top-right-radius: 4px;
 }
 
 .btn-primary:hover,

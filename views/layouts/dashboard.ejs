@@ -26,17 +26,20 @@
         <img src="assets/img/perfil.jpg" alt="" class="header__img" />
 
         <a href="#" class="header__logo">Placeholder</a>
-
-        <div class="header__search">
-          <input
-            id="profile-search-query"
-            type="search"
-            placeholder="Search"
-            class="header__input"
-          />
-          <i id="profile-search" class="bx bx-search header__icon"></i>
-        </div>
-
+        <form method="POST" action="/users/find">
+          <div class="header__search">
+            <input
+              name="query"
+              id="profile-search-query"
+              type="search"
+              placeholder="Search"
+              class="header__input"
+            />
+            <button type="submit">
+              <i id="profile-search" class="bx bx-search header__icon"></i>
+            </button>
+          </div>
+        </form>
         <div class="header__toggle">
           <i class="bx bx-menu" id="header-toggle"></i>
         </div>
@@ -61,7 +64,7 @@
                 <span class="nav__name">Home</span>
               </a>
 
-              <div class="nav__dropdown">
+              <!-- <div class="nav__dropdown">
                 <a href="#" class="nav__link">
                   <i class="bx bx-user nav__icon"></i>
                   <span class="nav__name">Profile</span>
@@ -77,15 +80,19 @@
                     <a href="#" class="nav__dropdown-item">Accounts</a>
                   </div>
                 </div>
-              </div>
+              </div> -->
+              <a href="#" class="nav__link">
+                <i class="bx bx-user nav__icon"></i>
+                <span class="nav__name">Profile</span>
+              </a>
 
               <a href="#" class="nav__link">
                 <i class="bx bx-message-rounded nav__icon"></i>
-                <span class="nav__name">Messages</span>
+                <span class="nav__name">My Posts</span>
               </a>
             </div>
 
-            <div class="nav__items">
+            <!-- <div class="nav__items">
               <h3 class="nav__subtitle">Menu</h3>
 
               <div class="nav__dropdown">
@@ -115,7 +122,7 @@
                 <i class="bx bx-bookmark nav__icon"></i>
                 <span class="nav__name">Saved</span>
               </a>
-            </div>
+            </div> -->
           </div>
         </div>
         <form

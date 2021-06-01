@@ -26,16 +26,3 @@ function colorLink() {
 linkColor.forEach(l => l.addEventListener("click", colorLink));
 
 /* Search Bar */
-const searchBtn = document.getElementById("profile-search");
-const searchContent = document.getElementById("profile-search-query");
-
-searchBtn.addEventListener("click", async () => {
-  await fetch("/users/", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ query: searchContent.value }),
-  });
-});

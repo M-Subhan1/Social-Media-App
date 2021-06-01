@@ -15,6 +15,8 @@ module.exports.populate = async (req, res) => {
     return time.getTime() - post.time.getTime() < 86400000;
   });
 
+  filteredPosts.sort((a, b) => b.time.getTime() - a.time.getTime());
+
   res.render("dashboard", {
     posts: filteredPosts,
     layout: "./layouts/dashboard",

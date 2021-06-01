@@ -58,7 +58,7 @@ module.exports.signup = async (req, res) => {
       email: req.body.email,
     });
 
-    if (user != null)
+    if (user != null && user.isVerified == true)
       err.push({ message: "Email registered with another user!" });
 
     const salt = await bcrypt.genSalt();
