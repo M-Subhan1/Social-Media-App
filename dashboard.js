@@ -9,8 +9,7 @@ module.exports.mine = async (req, res) => {
   const filteredPosts = await Post.find({ "author.id": req.user._id });
   // Sorting Posts
   filteredPosts.sort((a, b) => b.time.getTime() - a.time.getTime());
-
-  res.render("dashboard", {
+  res.render("timeline", {
     posts: filteredPosts,
     layout: "./layouts/dashboard",
     name: req.user.firstName,
