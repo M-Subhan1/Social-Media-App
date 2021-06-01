@@ -7,7 +7,12 @@ const passport = require("passport");
 const router = express.Router();
 
 // router.get("/profile", dashboard.profile);
-router.route("/profile").get(authentication.isLoggedIn, dashboard.profile);
+router
+  .route("/profile")
+  .get(authentication.isLoggedIn, dashboard.profile)
+  .post(() => {
+    console.log(req.body);
+  });
 router.route("/timeline").get(authentication.isLoggedIn, dashboard.mine);
 
 router

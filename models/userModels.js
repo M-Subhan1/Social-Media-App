@@ -74,12 +74,6 @@ const userSchema = new mongoose.Schema({
     trim: true,
   },
 
-  websiteURL: {
-    type: String,
-    default: "",
-    trim: true,
-  },
-
   address: {
     street: {
       type: String,
