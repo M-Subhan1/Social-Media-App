@@ -3,7 +3,7 @@ const User = require("../models/userModels");
 
 module.exports.post = async (req, res) => {
   // Error
-  if (req.body.content != "") {
+  if (req.body.content.trim() != "") {
     const new_post = {
       author: {
         firstName: req.user.firstName,
@@ -26,7 +26,7 @@ module.exports.post = async (req, res) => {
 
 module.exports.comment = async (req, res, next) => {
   //
-  if (req.body.text == "") return res.redirect("/");
+  if (req.body.text.trim() == "") return res.redirect("/");
 
   const new_comment = {
     author: {
