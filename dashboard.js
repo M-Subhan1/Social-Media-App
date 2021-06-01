@@ -1,5 +1,19 @@
 const Post = require("./models/postModel");
 
+module.exports.mine = async (req, res) => {
+  // Getting Posts
+  const posts = await Post.find({ author: req.user._id });
+  // Sorting Posts
+  posts.sort((a, b) => b.time.getTime() - a.time.getTime());
+  console.log(posts);
+  // REndering Website
+  res.render("dashboard", {
+    posts: posts,
+    layout: "./layouts/dashboard",
+    name: req.user.firstName,
+  });
+};
+
 module.exports.populate = async (req, res) => {
   //
   const queryObj = req.user.following.map(id => {

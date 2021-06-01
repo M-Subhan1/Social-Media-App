@@ -6,7 +6,7 @@ const passport = require("passport");
 
 const router = express.Router();
 
-router.route("/").all(authentication.isLoggedIn).get(dashboard.populate);
+router.route("/myPosts").get(dashboard.mine);
 
 router
   .route("/login")
@@ -56,6 +56,7 @@ router.post(
   authentication.updatePassword
 );
 
-router.all("^[^.]+$|.(?!(css|js)$)([^.]+$)", (req, res) => res.redirect("/"));
+router.route("/").all(authentication.isLoggedIn).get(dashboard.populate);
+// router.all("^[^.]+$|.(?!(css|js)$)([^.]+$)", (req, res) => res.redirect("/"));
 
 module.exports = router;

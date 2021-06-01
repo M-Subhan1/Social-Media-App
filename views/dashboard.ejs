@@ -8,7 +8,7 @@
       <button
         id="post-publish"
         type="submit"
-        class="d-inline-block btn btn-primary"
+        class="d-inline-block btn btn-primary container"
       >
         Publish
       </button>
@@ -18,8 +18,8 @@
 
 <div class="container">
   <div class="row">
-    <% posts.forEach(function(post, index) { %> <% if (index % 2 == 0) { %>
-    <div class="col-md-6">
+    <% posts.forEach(function(post) { %>
+    <div class="col-12">
       <div class="post-content">
         <div class="post-container">
           <img
@@ -81,70 +81,6 @@
         </div>
       </div>
     </div>
-    <% }}); %> <% posts.forEach(function(post, index) { %> <% if (index % 2 ==
-    1) { %>
-    <div class="col-md-6">
-      <div class="post-content">
-        <div class="post-container">
-          <img
-            src="https://bootdey.com/img/Content/avatar/avatar6.png"
-            alt="user"
-            class="profile-photo-md pull-left"
-          />
-          <div class="post-detail">
-            <div class="user-info">
-              <h5>
-                <a href="timeline.html" class="profile-link"
-                  ><%= post.author.firstName%> <%= post.author.lastName%></a
-                >
-                <!-- <span class="following">following</span> -->
-              </h5>
-              <!-- <p class="text-muted"></p> -->
-            </div>
-            <!-- <div class="reaction">
-              <a class="btn text-green"><i class="fa fa-thumbs-up"></i> 13</a>
-              <a class="btn text-red"><i class="fa fa-thumbs-down"></i> 0</a>
-            </div> -->
-            <div class="line-divider"></div>
-            <div class="post-text">
-              <p>
-                <%= post.content%>
-                <i class="em em-anguished"></i> <i class="em em-anguished"></i>
-                <i class="em em-anguished"></i>
-              </p>
-            </div>
-            <div class="line-divider"></div>
-            <% post.comments.forEach(function(comment) {%>
-            <h6><%=comment.author.firstName%> <%= comment.author.lastName%></h6>
-            <p><%=comment.text%></p>
-            <% }); %>
-          </div>
-          <div class="comment-content mt-3">
-            <div>
-              <div class="mb-3 container">
-                <form method="POST" action="<%= `/posts/comment/${post._id}`%>">
-                  <div class="mb-3 input-group">
-                    <textarea
-                      class="form-control custom-control"
-                      rows="2"
-                      style="resize: none"
-                      name="text"
-                    ></textarea>
-                    <button
-                      type="submit"
-                      class="input-group-addon btn btn-primary"
-                    >
-                      Comment
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-          <!-- </div> -->
-        </div>
-      </div>
-    </div>
-    <% }}); %>
+    <% }); %>
   </div>
 </div>
