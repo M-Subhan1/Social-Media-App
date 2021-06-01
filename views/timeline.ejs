@@ -1,6 +1,6 @@
 <link href="css/post.css" rel="stylesheet" />
 
-<div class="container mb-5">
+<div class="container mt-3 mb-5">
   <form method="POST" class="" action="/posts">
     <textarea class="form-control mb-2" name="content" id="content" rows="4">
     </textarea>
@@ -30,7 +30,7 @@
           <div class="post-detail">
             <div class="user-info">
               <h5>
-                <a href="timeline.html" class="profile-link"
+                <a href="/profile" class="profile-link"
                   ><%= post.author.firstName%> <%= post.author.lastName%></a
                 >
                 <!-- <span class="following">following</span> -->

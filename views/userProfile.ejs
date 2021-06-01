@@ -11,14 +11,18 @@
                   alt="Maxwell Admin"
                 />
               </div>
-              <h5 class="user-name">Yuki Hayashi</h5>
-              <h6 class="user-email">yuki@Maxwell.com</h6>
+              <h5 class="user-name" style="text-align: center">
+                <%= user.firstName %> <%= user.lastName %>
+              </h5>
+              <h6 class="user-email"><%= user.email %></h6>
             </div>
             <div class="about">
               <h5>About</h5>
               <p>
-                I'm Yuki. Full Stack Designer I enjoy creating user-centric,
-                delightful and human experiences.
+                <% if (user.about == '' || typeof user.about == 'undefined') {
+                %> I'm Yuki. Full Stack Designer I enjoy creating user-centric,
+                delightful and human experiences. <% } else {%> <%= user.about%>
+                <% } %>
               </p>
             </div>
           </div>
@@ -40,6 +44,7 @@
                   class="form-control"
                   id="fullName"
                   placeholder="Enter full name"
+                  value="<%= user.firstName %> <%= user.lastName %>"
                 />
               </div>
             </div>
@@ -51,6 +56,8 @@
                   class="form-control"
                   id="eMail"
                   placeholder="Enter email ID"
+                  value="<%= user.email%>"
+                  disabled
                 />
               </div>
             </div>
@@ -62,6 +69,7 @@
                   class="form-control"
                   id="phone"
                   placeholder="Enter phone number"
+                  value="<%= user.phoneNumber %>"
                 />
               </div>
             </div>
@@ -73,6 +81,7 @@
                   class="form-control"
                   id="website"
                   placeholder="Website url"
+                  value="<%= user.websiteURL %>"
                 />
               </div>
             </div>
@@ -89,6 +98,7 @@
                   class="form-control"
                   id="Street"
                   placeholder="Enter Street"
+                  value="<%= user.address.street %>"
                 />
               </div>
             </div>
@@ -100,6 +110,7 @@
                   class="form-control"
                   id="ciTy"
                   placeholder="Enter City"
+                  value="<%= user.address.city %>"
                 />
               </div>
             </div>
@@ -111,6 +122,7 @@
                   class="form-control"
                   id="sTate"
                   placeholder="Enter State"
+                  value="<%= user.address.state %>"
                 />
               </div>
             </div>
@@ -122,6 +134,7 @@
                   class="form-control"
                   id="zIp"
                   placeholder="Zip Code"
+                  value="<%= user.address.zipCode %>"
                 />
               </div>
             </div>
