@@ -176,7 +176,7 @@ module.exports.validateUser = async (req, res) => {
   );
 
   req.flash("message", "Account Verified!! You can now login");
-  return res.redirect(301, "/login");
+  return res.redirect("/login");
 };
 // Renders the Password Prompt webpage
 module.exports.setNewPassword = async (req, res) => {

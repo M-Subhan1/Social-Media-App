@@ -1,6 +1,6 @@
 <link href="css/post.css" rel="stylesheet" />
 
-<div class="container mb-5">
+<div class="container mb-4">
   <form method="POST" class="" action="/posts">
     <textarea class="form-control mb-2" name="content" id="content" rows="4">
     </textarea>
@@ -19,7 +19,7 @@
 <div class="container">
   <div class="row">
     <% posts.forEach(function(post) { %>
-    <div class="col-12">
+    <div class="col-12 mb-3">
       <div class="post-content">
         <div class="post-container">
           <img
@@ -30,10 +30,12 @@
           <div class="post-detail">
             <div class="user-info">
               <h5>
-                <a href="timeline.html" class="profile-link"
+                <a href="<%=post.author.id%>" class="profile-link"
                   ><%= post.author.firstName%> <%= post.author.lastName%></a
                 >
-                <!-- <span class="following">following</span> -->
+                <% if (post.author.id != user._id) {%>
+                <span class="following">following</span>
+                <% } %>
               </h5>
               <!-- <p class="text-muted"></p> -->
             </div>
@@ -41,15 +43,10 @@
               <a class="btn text-green"><i class="fa fa-thumbs-up"></i> 13</a>
               <a class="btn text-red"><i class="fa fa-thumbs-down"></i> 0</a>
             </div> -->
-            <div class="line-divider"></div>
             <div class="post-text">
-              <p class="post-content">
-                <%= post.content%>
-                <i class="em em-anguished"></i> <i class="em em-anguished"></i>
-                <i class="em em-anguished"></i>
-              </p>
+              <p><%= post.content%></p>
             </div>
-            <div class="post-content line-divider"></div>
+            <div class="post-content"></div>
             <% post.comments.forEach(function(comment) {%>
             <h6><%=comment.author.firstName%> <%= comment.author.lastName%></h6>
             <p><%=comment.text%></p>
@@ -65,8 +62,10 @@
                       rows="2"
                       style="resize: none"
                       name="text"
+                      id="comment"
                     ></textarea>
                     <button
+                      id="comment-btn"
                       type="submit"
                       class="input-group-addon btn btn-primary"
                     >

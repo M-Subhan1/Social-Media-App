@@ -17,7 +17,6 @@
                 <a href="/profile" class="profile-link"
                   ><%= post.author.firstName%> <%= post.author.lastName%></a
                 >
-                <!-- <span class="following">following</span> -->
               </h5>
               <!-- <p class="text-muted"></p> -->
             </div>
@@ -27,11 +26,7 @@
             </div> -->
             <div class="line-divider"></div>
             <div class="post-text">
-              <p class="post-content">
-                <%= post.content%>
-                <i class="em em-anguished"></i> <i class="em em-anguished"></i>
-                <i class="em em-anguished"></i>
-              </p>
+              <p><%= post.content%></p>
             </div>
             <div class="post-content line-divider"></div>
             <% post.comments.forEach(function(comment) {%>

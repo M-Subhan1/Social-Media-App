@@ -57,6 +57,7 @@ module.exports.populate = async (req, res) => {
   filteredPosts.sort((a, b) => b.time.getTime() - a.time.getTime());
   // Rendering webpage
   return res.render("dashboard", {
+    user: req.user,
     posts: filteredPosts,
     layout: "./layouts/dashboard",
     name: req.user.firstName,
