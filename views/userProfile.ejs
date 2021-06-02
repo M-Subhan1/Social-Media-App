@@ -1,4 +1,5 @@
-<div class="container profile-container">
+<form id="profile-form" action="/profile" method="POST">
+<div class="container profile-container mt-md-5">
   <div class="row gutters">
     <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
       <div class="card h-100">
@@ -11,18 +12,17 @@
                   alt="Maxwell Admin"
                 />
               </div>
-              <h5 class="user-name" style="text-align: center">
+              <h6 class="user-name mt-1" style="text-align: center">
                 <%= user.firstName %> <%= user.lastName %>
-              </h5>
-              <h6 class="user-email"><%= user.email %></h6>
+              </h6>
+              <h6 class="small user-email"><%= user.email %></h6>
             </div>
             <div class="about">
               <h5>About</h5>
-              <p>
-                <% if (user.about == '' || typeof user.about == 'undefined') {
-                %> I'm Yuki. Full Stack Designer I enjoy creating user-centric,
-                delightful and human experiences. <% } else {%> <%= user.about%>
+              <textarea name="about" class="form-control" rows="7" style="resize: none;"><% if (typeof user.about == 'undefined' || user.about.trim() == '') {
+                %> I'm Yuki. Full Stack Designer I enjoy creating user-centric, delightful and human experiences. <% } else {%><%=user.about%>
                 <% } %>
+              </textarea>
               </p>
             </div>
           </div>
@@ -30,7 +30,7 @@
       </div>
     </div>
     <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
-      <form id="profile-form" action="/profile" method="POST">
+      <!-- <form id="profile-form" action="/profile" method="POST"> -->
         <div class="card h-100">
           <div class="card-body">
             <div class="row gutters">
@@ -45,6 +45,7 @@
                     class="form-control"
                     id="profile-firstName"
                     placeholder="First Name"
+                    name="firstName"
                     value="<%= user.firstName %>"
                   />
                 </div>
@@ -57,6 +58,7 @@
                     class="form-control"
                     id="profile-lastName"
                     placeholder="Last Name"
+                    name="lastName"
                     value="<%= user.lastName %>"
                   />
                 </div>
@@ -70,6 +72,7 @@
                     id="eMail"
                     placeholder="Enter email ID"
                     value="<%= user.email%>"
+                    name="email"
                     disabled
                   />
                 </div>
@@ -81,6 +84,7 @@
                     type="text"
                     class="form-control"
                     id="phone"
+                    name="phoneNumber"
                     placeholder="Enter phone number"
                     value="<%= user.phoneNumber %>"
                   />
@@ -99,6 +103,7 @@
                     class="form-control"
                     id="Street"
                     placeholder="Enter Street"
+                    name="street"
                     value="<%= user.address.street %>"
                   />
                 </div>
@@ -111,6 +116,7 @@
                     class="form-control"
                     id="ciTy"
                     placeholder="Enter City"
+                    name="city"
                     value="<%= user.address.city %>"
                   />
                 </div>
@@ -122,6 +128,7 @@
                     type="text"
                     class="form-control"
                     id="sTate"
+                    name="state"
                     placeholder="Enter State"
                     value="<%= user.address.state %>"
                   />
@@ -131,10 +138,11 @@
                 <div class="form-group">
                   <label for="zIp">Zip Code</label>
                   <input
-                    type="text"
+                    type="number"
                     class="form-control"
                     id="zIp"
                     placeholder="Zip Code"
+                    name="zip"
                     value="<%= user.address.zipCode %>"
                   />
                 </div>
@@ -143,18 +151,12 @@
             <div class="row gutters">
               <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                 <div class="text-right">
-                  <form
-                    id="discard-changes"
-                    method="GET"
-                    action="/prfile"
-                  ></form>
                   <button
-                    type="submit"
                     id="discard-profile-changes"
                     class="btn btn-secondary"
                     form="discard-changes"
                   >
-                    Cancel
+                    <a href="/profile"> Cancel </a>
                   </button>
                   <button
                     id="update-profile"
@@ -169,7 +171,8 @@
             </div>
           </div>
         </div>
-      </form>
+      <!-- </form> -->
     </div>
   </div>
 </div>
+</form>

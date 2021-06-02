@@ -1,12 +1,33 @@
 const Post = require("./models/postModel");
+const User = require("./models/userModels");
 
 module.exports.profile = async (req, res) => {
   res.render("userProfile", { layout: "./layouts/dashboard", user: req.user });
 };
 
+module.exports.updateProfile = async (req, res) => {
+  await User.findOneAndUpdate(
+    { _id: req.user._id },
+    {
+      $set: {
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        phoneNumber: req.body.phoneNumber,
+        about: req.body.about,
+        address: {
+          street: req.body.street,
+          city: req.body.city,
+          state: req.body.state,
+          zipCode: req.body.zip,
+        },
+      },
+    }
+  );
+  res.redirect("/profile");
+};
+
 module.exports.mine = async (req, res) => {
   // Getting Posts
-  console.log("Hi");
   const filteredPosts = await Post.find({ "author.id": req.user._id });
   // Sorting Posts
   res.render("timeline", {
@@ -14,7 +35,6 @@ module.exports.mine = async (req, res) => {
     layout: "./layouts/dashboard",
     name: req.user.firstName,
   });
-  console.log(filteredPosts);
 };
 
 module.exports.populate = async (req, res) => {
@@ -24,7 +44,6 @@ module.exports.populate = async (req, res) => {
   });
 
   queryObj.push({ "author.id": req.user._id });
-
   // Apply filter for last 1 day
   const time = new Date();
   const posts = await Post.find({ $or: queryObj });

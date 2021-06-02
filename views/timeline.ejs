@@ -1,21 +1,5 @@
 <link href="css/post.css" rel="stylesheet" />
 
-<div class="container mt-3 mb-5">
-  <form method="POST" class="" action="/posts">
-    <textarea class="form-control mb-2" name="content" id="content" rows="4">
-    </textarea>
-    <div style="text-align: center">
-      <button
-        id="post-publish"
-        type="submit"
-        class="d-inline-block btn btn-primary container"
-      >
-        Publish
-      </button>
-    </div>
-  </form>
-</div>
-
 <div class="container">
   <div class="row">
     <% posts.forEach(function(post) { %>

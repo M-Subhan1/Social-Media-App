@@ -6,13 +6,13 @@ const passport = require("passport");
 
 const router = express.Router();
 
-// router.get("/profile", dashboard.profile);
+// Profile route
 router
   .route("/profile")
-  .get(authentication.isLoggedIn, dashboard.profile)
-  .post(() => {
-    console.log(req.body);
-  });
+  .all(authentication.isLoggedIn)
+  .get(dashboard.profile)
+  .post(dashboard.updateProfile);
+
 router.route("/timeline").get(authentication.isLoggedIn, dashboard.mine);
 
 router
