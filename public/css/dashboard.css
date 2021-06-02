@@ -365,8 +365,17 @@ img {
   border-bottom: 2px solid #11101d;
 }
 
-.bx {
+.bx-btns {
   padding: 2px;
   position: absolute;
   left: 21px;
+}
+
+.bx-searchBtn {
+  border: 1px solid;
+  border-radius: 4px;
+}
+
+.bx-search {
+  padding-top: 2px;
 }

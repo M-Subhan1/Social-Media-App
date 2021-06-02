@@ -34,7 +34,7 @@
               placeholder="Search"
               class="header__input"
             />
-            <button type="submit">
+            <button type="submit" class="bx-searchBtn">
               <i id="profile-search" class="bx bx-search header__icon"></i>
             </button>
           </div>
@@ -68,25 +68,25 @@
                 type="submit"
                 form="get-home"
                 id="btn-nav"
-                href="/profile"
                 class="active nav__link btn-primary"
               >
-                <i class="bx bx-home nav__icon"></i>
+                <i class="bx bx-btns bx-home nav__icon"></i>
                 <span class="nav__name">Home</span>
               </button>
 
               <form
                 id="get-profile"
                 method="GET"
-                action="/profile"
+                action="/profile/"
                 style="display: none"
               ></form>
               <button
                 id="btn-nav"
                 form="get-profile"
                 class="nav__link btn-primary"
+                type="submit"
               >
-                <i class="bx bx-user nav__icon"></i>
+                <i class="bx bx-btns bx-user nav__icon"></i>
                 <span class="nav__name">Profile</span>
               </button>
 
@@ -97,11 +97,12 @@
                 style="display: none"
               ></form>
               <button
+                type="submit"
                 form="get-posts"
                 id="btn-nav"
                 class="nav__link btn-primary"
               >
-                <i class="bx bx-message-rounded nav__icon"></i>
+                <i class="bx bx-btns bx-message-rounded nav__icon"></i>
                 <span class="nav__name">My Posts</span>
               </button>
             </div>
@@ -119,7 +120,7 @@
           id="btn-nav"
           class="nav__logout btn-primary"
         >
-          <i class="bx bx-log-out nav__icon"></i>
+          <i class="bx bx-btns bx-log-out nav__icon"></i>
           <span class="nav__name">Log Out</span>
         </button>
       </nav>
