@@ -1,4 +1,10 @@
-<form id="profile-form" action="/profile" method="POST">
+<form id="profile-form" action="<% if (same) { %>/profile<% } else { %>
+	<% if (typeof followed != undefined) { %>
+	<% if (followed)  { %>/users/unfollow/${user._id}
+	<% } else { %>users/follow/<%= user._id %>
+<% }}} %>" 
+                method="POST">
+
   <div class="container profile-container mt-md-5">
     <div class="row gutters">
       <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
@@ -19,7 +25,9 @@
               </div>
               <div class="about">
                 <h5>About</h5>
-                <textarea name="about" class="form-control" rows="7" style="resize: none;"><% if (typeof user.about == 'undefined' || user.about.trim() == '') {%> I'm Yuki. Full Stack Designer I enjoy creating user-centric, delightful and human experiences. <% } else {%><%=user.about%><% } %></textarea>
+                <textarea <% if (!same) { %>
+                        disabled
+                      <% } %> name="about" class="form-control" rows="7" style="resize: none;"><% if (typeof user.about == 'undefined' || user.about.trim() == '') {%> I'm Yuki. Full Stack Designer I enjoy creating user-centric, delightful and human experiences. <% } else {%><%=user.about%><% } %></textarea>
                 </p>
               </div>
             </div>
@@ -169,20 +177,25 @@
               <div class="row gutters">
                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                   <div class="text-right">
-                    <button
-                      id="discard-profile-changes"
-                      class="btn btn-secondary"
-                      form="discard-changes"
-                    >
-                      <a href="/profile"> Cancel </a>
-                    </button>
-                    <button
-                      id="update-profile"
-                      type="submit"
-                      class="btn btn-primary"
-                      form="profile-form"
-                    >
-                      Update
+                    <% if (same) { %>
+                      <button
+                        id="discard-profile-changes"
+                        class="btn btn-secondary"
+                        form="discard-changes"
+                      >
+                        <a href="/profile"> Cancel </a>
+                      </button>
+                    <% } %>
+                      <button
+                        id="update-profile"
+                        type="submit"
+                        class="btn btn-primary"
+                        form="profile-form"
+                      >
+                    <% if (same) { %> Update
+                    <% } else { if (typeof followed != "undefined" && followed) { %> Unfollow
+                      <% } else if (typeof followed != "undefined" && !followed) { %> Follow
+                    <% }} %>
                     </button>
                   </div>
                 </div>
