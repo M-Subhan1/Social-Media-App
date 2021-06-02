@@ -46,7 +46,17 @@ module.exports.comment = async (req, res, next) => {
 };
 
 module.exports.deletePost = async (req, res) => {
-  await Post.findOneAndDelete({ _id: req.params.id });
+  console.log(req.params);
+  if (req.user.posts.includes(req.params.post)) {
+    await Post.findOneAndDelete({ _id: req.params.post });
+    await User.findOneAndUpdate(
+      { _id: req.user._id },
+      { $pull: req.params.post }
+    );
+  }
+
+  console.log(req.params);
+  return res.redirect("/");
 };
 
 // module.exports.getAll = async (req, res, next) => {

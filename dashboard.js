@@ -26,6 +26,20 @@ module.exports.updateProfile = async (req, res) => {
       },
     }
   );
+  // Updating username in posts
+  await Post.updateMany(
+    {
+      "author.id": req.user._id,
+    },
+
+    {
+      $set: {
+        "author.firstName": req.body.firstName,
+        "author.lastName": req.body.lastName,
+      },
+    }
+  );
+
   return res.redirect("/profile");
 };
 

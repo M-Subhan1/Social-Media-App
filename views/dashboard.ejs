@@ -35,6 +35,12 @@
                 >
                 <% if (post.author.id != user._id) {%>
                 <span class="following">following</span>
+                <% } else { %>
+                <a
+                  href="<%=`posts/delete/${post._id}`%>"
+                  class="small text-red delete-post"
+                  >delete</a
+                >
                 <% } %>
               </h5>
               <!-- <p class="text-muted"></p> -->

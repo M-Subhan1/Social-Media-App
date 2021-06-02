@@ -395,3 +395,16 @@ img {
 .bx-search {
   padding-top: 2px;
 }
+
+.delete-post {
+  padding: 5px;
+  border-radius: 1px;
+  border: none;
+}
+
+.delete-post:hover {
+  cursor: pointer;
+  background: red;
+  color: white;
+  transition: all 0.25s;
+}
