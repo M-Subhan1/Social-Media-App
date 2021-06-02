@@ -7,6 +7,7 @@ const userController = require("../controllers/userController");
 router.post("/find", userController.findUsers);
 router.get("/follow/:id", userController.follow);
 router.get("/unfollow/:id", userController.unfollow);
+router.get("/profile/:id", userController.profile);
 
 module.exports = router;
 

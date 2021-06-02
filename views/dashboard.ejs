@@ -30,7 +30,9 @@
           <div class="post-detail">
             <div class="user-info">
               <h5>
-                <a href="<%=post.author.id%>" class="profile-link"
+                <a
+                  href="<%=`users/profile/${post.author.id}`%>"
+                  class="profile-link"
                   ><%= post.author.firstName%> <%= post.author.lastName%></a
                 >
                 <% if (post.author.id != user._id) {%>

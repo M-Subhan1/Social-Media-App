@@ -31,7 +31,6 @@ module.exports.findUsers = async (req, res) => {
     users: users,
   });
 };
-
 // follow user
 module.exports.follow = async (req, res) => {
   // if trying to follow myself, redirect
@@ -67,7 +66,6 @@ module.exports.follow = async (req, res) => {
 
   res.redirect("/");
 };
-
 // unfollow user
 module.exports.unfollow = async (req, res) => {
   if (req.user._id.toString() == req.params.id) return res.redirect("/");
@@ -89,4 +87,18 @@ module.exports.unfollow = async (req, res) => {
   );
 
   res.redirect("/");
+};
+// User Profile
+module.exports.profile = async (req, res) => {
+  const user = await User.findOne({ _id: req.params.id });
+
+  console.log(user);
+
+  if (user == null) return res.redirect("/");
+
+  res.render("userProfile", {
+    layout: "./layouts/dashboard",
+    user: user,
+    same: req.user._id == user._id,
+  });
 };
