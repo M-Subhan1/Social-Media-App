@@ -80,6 +80,7 @@ module.exports.signup = async (req, res) => {
       followers: [],
       posts: [],
       gender: req.body.gender,
+      dateJoined: new Date(),
     };
 
     // If errors exist, prompting for input again // Fix thiss

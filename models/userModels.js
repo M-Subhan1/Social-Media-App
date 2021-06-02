@@ -96,7 +96,7 @@ const userSchema = new mongoose.Schema({
 
   dateJoined: {
     type: Date,
-    default: new Date(),
+    required: true,
   },
 });
 
