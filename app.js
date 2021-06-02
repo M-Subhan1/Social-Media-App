@@ -50,6 +50,6 @@ app.use("/users", authentication.isLoggedIn, userRouter);
 app.use("/posts", authentication.isLoggedIn, postRouter);
 // Authentication Routes
 app.use("/", authRouter);
-
+app.use("/", (req, res) => res.redirect("/"));
 // Exporting the app
 module.exports = app;

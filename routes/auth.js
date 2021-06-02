@@ -9,7 +9,7 @@ const router = express.Router();
 // Profile route
 router
   .route("/profile")
-  // .all(authentication.isLoggedIn)
+  .all(authentication.isLoggedIn)
   .get(dashboard.profile)
   .post(dashboard.updateProfile);
 
@@ -65,4 +65,5 @@ router.post(
 
 router.route("/").all(authentication.isLoggedIn).get(dashboard.populate);
 
+router.use("/", (req, res) => res.redirect("/"));
 module.exports = router;
