@@ -13,6 +13,11 @@ const userSchema = new mongoose.Schema({
     trim: true,
   },
 
+  gender: {
+    type: String,
+    required: [true, "User should have a gender"],
+  },
+
   password: {
     type: String,
     required: [true, "User should have a password"],
@@ -23,6 +28,33 @@ const userSchema = new mongoose.Schema({
     required: [true, "User should have an email"],
     unique: true,
     trim: true,
+  },
+
+  about: {
+    type: String,
+    trim: true,
+  },
+
+  phoneNumber: {
+    type: String,
+    trim: true,
+  },
+
+  address: {
+    street: {
+      type: String,
+      trim: true,
+    },
+    city: {
+      type: String,
+      trim: true,
+    },
+    state: {
+      type: String,
+      trim: true,
+    },
+
+    zipCode: { type: Number },
   },
 
   isVerified: {
@@ -60,32 +92,6 @@ const userSchema = new mongoose.Schema({
     type: [String],
     required: true,
     trim: true,
-  },
-
-  about: {
-    type: String,
-    trim: true,
-  },
-
-  phoneNumber: {
-    type: String,
-    trim: true,
-  },
-
-  address: {
-    street: {
-      type: String,
-      trim: true,
-    },
-    city: {
-      type: String,
-      trim: true,
-    },
-    state: {
-      type: String,
-      trim: true,
-    },
-    zipCode: { type: Number, trim: true },
   },
 });
 

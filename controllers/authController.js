@@ -36,6 +36,7 @@ module.exports.isLoggedOut = (req, res, next) => {
 };
 // Validates data Signups the user
 module.exports.signup = async (req, res) => {
+  console.log(req.body);
   try {
     let err = [];
 
@@ -44,9 +45,10 @@ module.exports.signup = async (req, res) => {
       !req.body.lastName ||
       !req.body.password ||
       !req.body.password2 ||
-      !req.body.email
+      !req.body.email ||
+      !req.body.gender
     )
-      err.push({ message: "Fill in all the fields" });
+      err.push({ message: "Kindly fill in all the fields" });
 
     if (req.body.password.length < 6)
       err.push({ message: "Password must be greater than 6 characters" });
@@ -77,6 +79,7 @@ module.exports.signup = async (req, res) => {
       following: [],
       followers: [],
       posts: [],
+      gender: req.body.gender,
     };
 
     // If errors exist, prompting for input again // Fix thiss
@@ -107,9 +110,6 @@ module.exports.signup = async (req, res) => {
     transporter.sendMail(emailConfig, function (error, info) {
       if (error) {
         console.log(error);
-      } else {
-        console.log("Message sent: " + info.message);
-        console.log("Preview: " + nodemailer.getTestMessageUrl(info));
       }
     });
 
