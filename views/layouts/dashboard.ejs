@@ -58,10 +58,52 @@
             <div class="nav__items">
               <h3 class="nav__subtitle">Profile</h3>
 
-              <a href="/" class="nav__link active">
+              <form
+                id="get-home"
+                method="GET"
+                action="/"
+                style="display: none"
+              ></form>
+              <button
+                type="submit"
+                form="get-home"
+                id="btn-nav"
+                href="/profile"
+                class="active nav__link btn-primary"
+              >
                 <i class="bx bx-home nav__icon"></i>
                 <span class="nav__name">Home</span>
-              </a>
+              </button>
+
+              <form
+                id="get-profile"
+                method="GET"
+                action="/profile"
+                style="display: none"
+              ></form>
+              <button
+                id="btn-nav"
+                form="get-profile"
+                class="nav__link btn-primary"
+              >
+                <i class="bx bx-user nav__icon"></i>
+                <span class="nav__name">Profile</span>
+              </button>
+
+              <form
+                id="get-posts"
+                method="GET"
+                action="/timeline"
+                style="display: none"
+              ></form>
+              <button
+                form="get-posts"
+                id="btn-nav"
+                class="nav__link btn-primary"
+              >
+                <i class="bx bx-message-rounded nav__icon"></i>
+                <span class="nav__name">My Posts</span>
+              </button>
 
               <!-- <div class="nav__dropdown">
                 <a href="#" class="nav__link">
@@ -80,15 +122,6 @@
                   </div>
                 </div>
               </div> -->
-              <a href="/profile" class="nav__link">
-                <i class="bx bx-user nav__icon"></i>
-                <span class="nav__name">Profile</span>
-              </a>
-
-              <a href="/timeline" class="nav__link">
-                <i class="bx bx-message-rounded nav__icon"></i>
-                <span class="nav__name">My Posts</span>
-              </a>
             </div>
 
             <!-- <div class="nav__items">
@@ -125,21 +158,20 @@
           </div>
         </div>
         <form
-          class="nav__link nav__logout"
           id="logout-form"
           method="POST"
           action="/logout"
-          style="display: hidden"
+          style="display: none"
+        ></form>
+        <button
+          form="logout-form"
+          type="submit"
+          id="btn-nav"
+          class="nav__logout btn-primary"
         >
-          <button
-            form="logout-form"
-            type="submit"
-            class="nav__link nav__logout btn btn-primary"
-          >
-            <i class="bx bx-log-out nav__icon"></i>
-            <span class="nav__name">Log Out</span>
-          </button>
-        </form>
+          <i class="bx bx-log-out nav__icon"></i>
+          <span class="nav__name">Log Out</span>
+        </button>
       </nav>
     </div>
 

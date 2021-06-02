@@ -2,7 +2,10 @@ const Post = require("./models/postModel");
 const User = require("./models/userModels");
 
 module.exports.profile = async (req, res) => {
-  res.render("userProfile", { layout: "./layouts/dashboard", user: req.user });
+  return res.render("userProfile", {
+    layout: "./layouts/dashboard",
+    user: req.user,
+  });
 };
 
 module.exports.updateProfile = async (req, res) => {
@@ -23,7 +26,7 @@ module.exports.updateProfile = async (req, res) => {
       },
     }
   );
-  res.redirect("/profile");
+  return res.redirect("/profile");
 };
 
 module.exports.mine = async (req, res) => {
@@ -53,7 +56,7 @@ module.exports.populate = async (req, res) => {
   // Sorting posts by time (most recent first)
   filteredPosts.sort((a, b) => b.time.getTime() - a.time.getTime());
   // Rendering webpage
-  res.render("dashboard", {
+  return res.render("dashboard", {
     posts: filteredPosts,
     layout: "./layouts/dashboard",
     name: req.user.firstName,

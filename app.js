@@ -51,6 +51,5 @@ app.use("/posts", authentication.isLoggedIn, postRouter);
 // Authentication Routes
 app.use("/", authRouter);
 
-app.get("^[^.]+$|.(?!(css|js)$)([^.]+$)", (req, res) => res.redirect("/"));
 // Exporting the app
 module.exports = app;

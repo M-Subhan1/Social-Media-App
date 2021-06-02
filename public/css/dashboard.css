@@ -256,6 +256,8 @@ img {
 /*===== Active link =====*/
 .active {
   color: var(--first-color);
+  border: var(--first-color);
+  box-shadow: none;
 }
 
 /* ========== MEDIA QUERIES ==========*/
@@ -335,13 +337,36 @@ img {
 .btn-primary {
   color: white;
   background: #11101d;
-  border-color: #11101d;
+  border-bottom-style: solid;
 }
 
 .btn-primary:hover,
 .btn-primary:focus,
 .btn-primary:active {
-  border-color: #11101d;
   background: #ffffff;
   color: #11101d;
+}
+
+#btn-nav {
+  padding: 5px;
+  min-width: 60px;
+  display: inline-block;
+  color: #11101d;
+  background: #ffffff;
+  border: none;
+}
+
+#btn-nav:active,
+#btn-nav:hover,
+#btn-nav:focus {
+  box-shadow: none;
+  background: #ffffff;
+  color: #11101d;
+  border-bottom: 2px solid #11101d;
+}
+
+.bx {
+  padding: 2px;
+  position: absolute;
+  left: 21px;
 }
