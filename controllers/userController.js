@@ -4,7 +4,6 @@ const User = require("../models/userModels");
 module.exports.update = (req, res) => {
   res.render("update");
 };
-
 // find a user
 module.exports.findUsers = async (req, res) => {
   const users = await User.find({
@@ -27,6 +26,7 @@ module.exports.findUsers = async (req, res) => {
   if (users.length > 3) for (let i = users.length; i > 3; i--) users.pop();
 
   res.render("searchUsers", {
+    layout: "/layouts/dashboard",
     title: "Proj",
     users: users,
   });
@@ -92,13 +92,12 @@ module.exports.unfollow = async (req, res) => {
 module.exports.profile = async (req, res) => {
   const user = await User.findOne({ _id: req.params.id });
 
-  console.log(user);
-
   if (user == null) return res.redirect("/");
 
   res.render("userProfile", {
     layout: "./layouts/dashboard",
     user: user,
-    same: req.user._id == user._id,
+    same: req.user.id.toString() == user._id.toString(),
+    followed: req.user.following.includes(user.id.toString()),
   });
 };
