@@ -1,9 +1,6 @@
-<form id="profile-form" action="<% if (same) { %>/profile<% } else { %>
-	<% if (typeof followed != undefined) { %>
-	<% if (followed)  { %>/users/unfollow/${user._id}
-	<% } else { %>users/follow/<%= user._id %>
+<form id="profile-form" action="<% if (same) { %>/profile<% } else { %><% if (typeof followed != undefined) { %><% if (followed)  { %>/users/unfollow/<%= user._id %><% } else { %>users/follow/<%= user._id %>
 <% }}} %>" 
-                method="POST">
+        method="POST">
 
   <div class="container profile-container mt-md-5">
     <div class="row gutters">
