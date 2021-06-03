@@ -57,10 +57,10 @@
             <div class="post-content"></div>
             <% post.comments.forEach(function(comment) {%>
             <h6><%=comment.author.firstName%> <%= comment.author.lastName%></h6>
-            <p><%=comment.text%></p>
+            <p class="comment-content"><%=comment.text%></p>
             <% }); %>
           </div>
-          <div class="comment-content mt-3">
+          <div class="mt-3">
             <div>
               <div class="mb-3 container">
                 <form method="POST" action="<%= `/posts/comment/${post._id}`%>">
