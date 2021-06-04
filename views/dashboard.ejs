@@ -55,7 +55,9 @@
             </div>
             <div class="post-content"></div>
             <% post.comments.forEach(function(comment) {%>
-            <h6><%=comment.author.firstName%> <%= comment.author.lastName%></h6>
+            <a class="h6" href="<%=`/users/profile/${comment.author.id}`%>"
+              ><%=comment.author.firstName%> <%= comment.author.lastName%></a
+            >
             <p class="comment-content"><%=comment.text%></p>
             <% }); %>
           </div>
