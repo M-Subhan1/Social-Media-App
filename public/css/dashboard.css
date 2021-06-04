@@ -408,3 +408,7 @@ img {
   color: white;
   transition: all 0.25s;
 }
+
+.search-results {
+  background-color: #ffffff;
+}

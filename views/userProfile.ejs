@@ -1,4 +1,4 @@
-<form id="profile-form" action="<% if (same) { %>/profile<% } else { %><% if (typeof followed != undefined) { %><% if (followed)  { %>/users/unfollow/<%= user._id %><% } else { %>users/follow/<%= user._id %>
+<form id="profile-form" action="<% if (same) { %>/profile<% } else { %><% if (typeof followed != undefined) { %><% if (followed)  { %>/users/unfollow/<%= user._id %><% } else { %>/users/follow/<%= user._id %>
 <% }}} %>" 
         method="POST">
 
@@ -22,9 +22,9 @@
               </div>
               <div class="about">
                 <h5>About</h5>
-                <textarea <% if (!same) { %>
+                <textarea placeholder="Lorem ipsum dolor, sit amet consectetur adipisicing elit. Impedit aliquam totam esse ratione distinctio sint doloribus ducimus voluptatibus. Possimus nulla voluptatum error enim dignissimos optio!" <% if (!same) { %>
                         disabled
-                      <% } %> name="about" class="form-control" rows="7" style="resize: none;"><% if (typeof user.about == 'undefined' || user.about.trim() == '') {%> I'm Yuki. Full Stack Designer I enjoy creating user-centric, delightful and human experiences. <% } else {%><%=user.about%><% } %></textarea>
+                      <% } %> name="about" class="form-control" rows="7" style="resize: none;"><% if (typeof user.about == 'undefined' || user.about.trim() == '') {%><% } else {%><%=user.about%><% } %></textarea>
                 </p>
               </div>
             </div>
@@ -89,6 +89,7 @@
                   <div class="form-group">
                     <label for="phone">Phone</label>
                     <input
+                      placeholder="+XX 1234567890"
                       type="text"
                       class="form-control"
                       id="phone"
@@ -174,15 +175,13 @@
               <div class="row gutters">
                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                   <div class="text-right">
-                    <% if (same) { %>
                       <button
                         id="discard-profile-changes"
                         class="btn btn-secondary"
                         form="discard-changes"
                       >
-                        <a href="/profile"> Cancel </a>
+                        <a href="/"> Go Back </a>
                       </button>
-                    <% } %>
                       <button
                         id="update-profile"
                         type="submit"

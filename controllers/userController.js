@@ -1,4 +1,3 @@
-const bcrypt = require("bcryptjs");
 const User = require("../models/userModels");
 
 module.exports.update = (req, res) => {
@@ -6,27 +5,19 @@ module.exports.update = (req, res) => {
 };
 // find a user
 module.exports.findUsers = async (req, res) => {
+  // Finding query
+  const query = req.body.query
+    .split(" ")
+    .map(el => el[0].toUpperCase() + el.slice(1));
+
+  // const queryString = query.join(" ");
+
   const users = await User.find({
-    $or: [
-      { email: req.body.query },
-      { firstName: req.body.query },
-      { lastName: req.body.query },
-    ],
+    $or: [{ email: query }, { firstName: query }, { lastName: query }],
   });
 
-  if (users.length < 3) {
-    const moreUsers = await User.find();
-    moreUsers.sort((a, b) => {
-      b.tokenTime.getTime() - a.tokenTime.getTime();
-    });
-
-    for (let i = users.length; i < 3; i++) users.push(moreUsers[i]);
-  }
-
-  if (users.length > 3) for (let i = users.length; i > 3; i--) users.pop();
-
-  res.render("searchUsers", {
-    layout: "/layouts/dashboard",
+  res.render("searchResults", {
+    layout: "layouts/dashboardLayout.ejs",
     title: "Proj",
     users: users,
   });
@@ -70,8 +61,6 @@ module.exports.follow = async (req, res) => {
 module.exports.unfollow = async (req, res) => {
   if (req.user._id.toString() == req.params.id) return res.redirect("/");
 
-  console.log("HEllo");
-
   await User.updateOne(
     { _id: req.user._id },
     {
@@ -95,7 +84,7 @@ module.exports.profile = async (req, res) => {
   if (user == null) return res.redirect("/");
 
   res.render("userProfile", {
-    layout: "./layouts/dashboard",
+    layout: "./layouts/dashboardLayout",
     user: user,
     same: req.user.id.toString() == user._id.toString(),
     followed: req.user.following.includes(user.id.toString()),

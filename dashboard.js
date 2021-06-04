@@ -3,7 +3,7 @@ const User = require("./models/userModels");
 
 module.exports.profile = async (req, res) => {
   return res.render("userProfile", {
-    layout: "./layouts/dashboard",
+    layout: "./layouts/dashboardLayout",
     user: req.user,
     same: true,
   });
@@ -50,7 +50,7 @@ module.exports.mine = async (req, res) => {
   // Sorting Posts
   res.render("timeline", {
     posts: filteredPosts,
-    layout: "./layouts/dashboard",
+    layout: "./layouts/dashboardLayout",
     name: req.user.firstName,
   });
 };
@@ -66,7 +66,7 @@ module.exports.populate = async (req, res) => {
   const time = new Date();
   const posts = await Post.find({ $or: queryObj });
   const filteredPosts = posts.filter(post => {
-    return time.getTime() - post.time.getTime() < 86400000;
+    return time.getTime() - post.time.getTime() < 259200000;
   });
   // Sorting posts by time (most recent first)
   filteredPosts.sort((a, b) => b.time.getTime() - a.time.getTime());
@@ -74,7 +74,7 @@ module.exports.populate = async (req, res) => {
   return res.render("dashboard", {
     user: req.user,
     posts: filteredPosts,
-    layout: "./layouts/dashboard",
+    layout: "./layouts/dashboardLayout",
     name: req.user.firstName,
   });
 };
