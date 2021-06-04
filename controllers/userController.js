@@ -4,17 +4,22 @@ module.exports.update = (req, res) => {
   res.render("update");
 };
 // find a user
-module.exports.findUsers = async (req, res) => {
+module.exports.findUsers = async (req, res, next) => {
   // Finding query
+  if (req.body.query.trim() == "") return next();
+
   const query = req.body.query
+    .trim()
     .split(" ")
     .map(el => el[0].toUpperCase() + el.slice(1));
 
+  query.push(req.body.query);
   // const queryString = query.join(" ");
-
   const users = await User.find({
     $or: [{ email: query }, { firstName: query }, { lastName: query }],
   });
+
+  console.log(users);
 
   res.render("searchResults", {
     layout: "layouts/dashboardLayout.ejs",

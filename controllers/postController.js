@@ -2,7 +2,7 @@ const Post = require("../models/postModel");
 const User = require("../models/userModels");
 
 module.exports.post = async (req, res) => {
-  // Error
+  // Turn into class
   if (req.body.content.trim() != "") {
     const new_post = {
       author: {
@@ -28,6 +28,7 @@ module.exports.comment = async (req, res, next) => {
   //
   if (req.body.text.trim() == "") return res.redirect("/");
 
+  // Turn into class
   const new_comment = {
     author: {
       id: req.user._id,
@@ -57,15 +58,3 @@ module.exports.deletePost = async (req, res) => {
 
   return res.redirect("/");
 };
-
-// module.exports.getAll = async (req, res, next) => {
-//   const queryObj = req.user.following.map(id => {
-//     return { author: id };
-//   });
-
-//   queryObj.push({ author: req.user._id });
-//   // Apply filter for last 1 day
-//   const posts = await Post.find({ $or: queryObj });
-//   console.log(posts);
-//   next();
-// };
