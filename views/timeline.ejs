@@ -1,51 +1,57 @@
-<link href="css/post.css" rel="stylesheet" />
-
 <div class="container">
   <div class="row">
     <% posts.forEach(function(post) { %>
-    <div class="col-12">
+    <div class="col-12 mb-3">
       <div class="post-content">
         <div class="post-container">
-          <img
-            src="https://bootdey.com/img/Content/avatar/avatar6.png"
-            alt="user"
-            class="profile-photo-md pull-left"
-          />
-          <div class="post-detail">
+          <div class="px-5 pt-5">
             <div class="user-info">
-              <h5>
-                <a href="/profile" class="profile-link"
+              <h5 class="">
+                <a
+                  href="<%=`users/profile/${post.author.id}`%>"
+                  class="profile-link"
                   ><%= post.author.firstName%> <%= post.author.lastName%></a
                 >
+                <% if (post.author.id != user._id) {%>
+                <span class="following">following</span>
+                <% } else { %>
+                <a
+                  href="<%=`posts/delete/${post._id}`%>"
+                  class="small text-red delete-post"
+                  >delete</a
+                >
+                <% } %>
               </h5>
-              <!-- <p class="text-muted"></p> -->
             </div>
-            <!-- <div class="reaction">
-              <a class="btn text-green"><i class="fa fa-thumbs-up"></i> 13</a>
-              <a class="btn text-red"><i class="fa fa-thumbs-down"></i> 0</a>
-            </div> -->
-            <div class="line-divider"></div>
-            <div class="post-text">
+
+            <div class="post-text mb-2">
               <p><%= post.content%></p>
+              <% if (typeof post.image != 'undefined' || post.image) {%>
+              <img class="post-image" src="<%=`img/posts/${post.image}`%>" />
+              <% } %>
             </div>
-            <div class="post-content line-divider"></div>
+            <div class="post-content"></div>
             <% post.comments.forEach(function(comment) {%>
-            <h6><%=comment.author.firstName%> <%= comment.author.lastName%></h6>
-            <p><%=comment.text%></p>
+            <a class="h6" href="<%=`/users/profile/${comment.author.id}`%>"
+              ><%=comment.author.firstName%> <%= comment.author.lastName%></a
+            >
+            <p class="comment-content"><%=comment.text%></p>
             <% }); %>
           </div>
-          <div class="comment-content mt-3">
+          <div class="">
             <div>
-              <div class="mb-3 container">
+              <div class="mb-3">
                 <form method="POST" action="<%= `/posts/comment/${post._id}`%>">
-                  <div class="mb-3 input-group">
+                  <div class="input-group pl-5 pr-5">
                     <textarea
                       class="form-control custom-control"
                       rows="2"
                       style="resize: none"
                       name="text"
+                      id="comment"
                     ></textarea>
                     <button
+                      id="comment-btn"
                       type="submit"
                       class="input-group-addon btn btn-primary"
                     >

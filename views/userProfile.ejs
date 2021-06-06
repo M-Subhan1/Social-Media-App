@@ -34,10 +34,10 @@
                         disabled
                       <% } %> name="about" class="form-control" rows="7" style="resize: none;"><% if (typeof user.about == 'undefined' || user.about == '') {%><% } else {%><%=user.about%><% } %></textarea>
                 </p>
-                <% if (!same) { %>
+                <% if (same) { %>
                   <h6>Upload Photo</h6>
                   <input type="file" name="image"></input>
-                <% } %>
+                <% } %>>
               </div>
             </div>
           </div>
