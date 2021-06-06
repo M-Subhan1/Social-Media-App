@@ -16,13 +16,17 @@ const transporter = nodemailer.createTransport({
 
 // Checks if the token string is valid
 module.exports.isValidToken = async (req, res, next) => {
-  const user = await User.findOne({ tokenString: req.params.token });
+  try {
+    const user = await User.findOne({ tokenString: req.params.token });
 
-  if (user == null || !user.tokenIsValid) {
-    req.flash("info", "The link has expired!!");
-    return res.redirect(301, "/login");
+    if (user == null || !user.tokenIsValid) {
+      req.flash("info", "The link has expired!!");
+      return res.redirect(301, "/login");
+    }
+    next();
+  } catch {
+    res.status(404).send("Error: 404");
   }
-  next();
 };
 // Checks if the user is logged out, else redirects to login
 module.exports.isLoggedIn = (req, res, next) => {
@@ -36,7 +40,6 @@ module.exports.isLoggedOut = (req, res, next) => {
 };
 // Validates data Signups the user
 module.exports.signup = async (req, res) => {
-  console.log(req.body);
   try {
     let err = [];
 
@@ -118,9 +121,7 @@ module.exports.signup = async (req, res) => {
     req.flash("message", "Account created!! Verify your email to login");
     res.redirect(301, "/login");
   } catch (err) {
-    res.status(500).json({
-      data: err,
-    });
+    res.status(404).send("Error: 404");
   }
 };
 // Password Configuration
@@ -163,98 +164,112 @@ module.exports.logOut = (req, res) => {
 };
 // Validates login
 module.exports.validateUser = async (req, res) => {
-  const user = await User.findOne({ tokenString: req.params.token });
-  const time = new Date();
+  try {
+    const user = await User.findOne({ tokenString: req.params.token });
+    const time = new Date();
 
-  if (user == null || !user.tokenIsValid || user.isVerified) {
-    req.flash("info", "Invalid link");
+    if (user == null || !user.tokenIsValid || user.isVerified) {
+      req.flash("info", "Invalid link");
+      return res.redirect("/login");
+    }
+
+    await User.updateOne(
+      { email: user.email },
+      { $set: { isVerified: true, tokenIsValid: false } }
+    );
+
+    req.flash("message", "Account Verified!! You can now login");
     return res.redirect("/login");
-  }
-
-  await User.updateOne(
-    { email: user.email },
-    { $set: { isVerified: true, tokenIsValid: false } }
-  );
-
-  req.flash("message", "Account Verified!! You can now login");
-  return res.redirect("/login");
+  } catch {}
 };
 // Renders the Password Prompt webpage
 module.exports.setNewPassword = async (req, res) => {
-  res.render("setPassword", {
-    title: "Password Reset",
-    url: `/password/${req.params.token}`,
-    warning: req.flash("warning"),
-  });
+  try {
+    res.render("setPassword", {
+      title: "Password Reset",
+      url: `/password/${req.params.token}`,
+      warning: req.flash("warning"),
+    });
+  } catch {
+    res.status(404).send("Error: 404");
+  }
 };
 // Validates and stores password update
 module.exports.updatePassword = async (req, res) => {
-  if (req.body.password != req.body.password2) {
-    req.flash("warning", "Both passwords must match!!");
-    return res.redirect(`/reset/${req.params.token}`);
+  try {
+    if (req.body.password != req.body.password2) {
+      req.flash("warning", "Both passwords must match!!");
+      return res.redirect(`/reset/${req.params.token}`);
+    }
+
+    if (req.body.password.length < 6) {
+      req.flash("warning", "Password must be greater than 6 characters");
+      return res.redirect(`/reset/${req.params.token}`);
+    }
+
+    const salt = await bcrypt.genSalt();
+    const hashed_password = await bcrypt.hash(req.body.password, salt);
+    await User.updateOne(
+      { tokenString: req.params.token.trim() },
+      { $set: { password: hashed_password, tokenIsValid: true } }
+    );
+
+    req.flash("message", "Password updated!!");
+    return res.redirect("/login");
+  } catch {
+    res.status(404).send("Error: 404");
   }
-
-  if (req.body.password.length < 6) {
-    req.flash("warning", "Password must be greater than 6 characters");
-    return res.redirect(`/reset/${req.params.token}`);
-  }
-
-  const salt = await bcrypt.genSalt();
-  const hashed_password = await bcrypt.hash(req.body.password, salt);
-  await User.updateOne(
-    { tokenString: req.params.token.trim() },
-    { $set: { password: hashed_password, tokenIsValid: true } }
-  );
-
-  req.flash("message", "Password updated!!");
-  return res.redirect("/login");
 };
 // Sends Password Reset Emails
 module.exports.reset = async (req, res) => {
-  let err = [];
+  try {
+    let err = [];
 
-  const user = await User.findOne({ email: req.body.email });
-  const token = uniqueString();
+    const user = await User.findOne({ email: req.body.email });
+    const token = uniqueString();
 
-  if (user == null) {
-    err.push({ message: "No user exists for the email" });
-    return res.render("reset", { title: "Password Reset", err });
-  }
+    if (user == null) {
+      err.push({ message: "No user exists for the email" });
+      return res.render("reset", { title: "Password Reset", err });
+    }
 
-  if (!user.isVerified) {
-    err.push({
-      message: "User has to be verified before you can reset password!!",
+    if (!user.isVerified) {
+      err.push({
+        message: "User has to be verified before you can reset password!!",
+      });
+
+      return res.render("reset", { title: "Password Reset", err });
+    }
+
+    await User.updateOne(
+      { email: req.body.email },
+      {
+        $set: { tokenTime: new Date(), tokenString: token, tokenIsValid: true },
+      }
+    );
+
+    const domain = process.env.DOMAIN || "localhost:5000/";
+    // turn into a class
+    const emailConfig = {
+      from: `${process.env.EMAIL}`,
+      to: `${user.email}`,
+      subject: "Reset Password",
+      text: `Hi ${user.firstName} ${user.lastName}, your (or someone else) has requested password reset for this account!!
+          Paste the following link in your browser to reset your password: ${domain}reset/${token}`,
+    };
+
+    transporter.sendMail(emailConfig, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("Message sent: " + info.message);
+        console.log("Preview: " + nodemailer.getTestMessageUrl(info));
+      }
     });
 
-    return res.render("reset", { title: "Password Reset", err });
+    req.flash("message", "Check your email for password reset instructions");
+    res.redirect("/login");
+  } catch {
+    res.status(404).send("Error: 404");
   }
-
-  await User.updateOne(
-    { email: req.body.email },
-    {
-      $set: { tokenTime: new Date(), tokenString: token, tokenIsValid: true },
-    }
-  );
-
-  const domain = process.env.DOMAIN || "localhost:5000/";
-  // turn into a class
-  const emailConfig = {
-    from: `${process.env.EMAIL}`,
-    to: `${user.email}`,
-    subject: "Reset Password",
-    text: `Hi ${user.firstName} ${user.lastName}, your (or someone else) has requested password reset for this account!!
-          Paste the following link in your browser to reset your password: ${domain}reset/${token}`,
-  };
-
-  transporter.sendMail(emailConfig, function (error, info) {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log("Message sent: " + info.message);
-      console.log("Preview: " + nodemailer.getTestMessageUrl(info));
-    }
-  });
-
-  req.flash("message", "Check your email for password reset instructions");
-  res.redirect("/login");
 };

@@ -11,7 +11,7 @@ router
   .route("/profile")
   .all(authentication.isLoggedIn)
   .get(dashboard.profile)
-  .post(dashboard.updateProfile);
+  .post(dashboard.uploadPhoto, dashboard.updateProfile);
 
 router.route("/timeline").get(authentication.isLoggedIn, dashboard.mine);
 

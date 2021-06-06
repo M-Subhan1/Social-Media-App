@@ -44,6 +44,10 @@ const postSchema = new mongoose.Schema({
     },
   },
 
+  image: {
+    type: String,
+  },
+
   content: {
     type: String,
     required: [true, "Post Must have some content"],

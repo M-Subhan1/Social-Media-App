@@ -35,6 +35,10 @@ const userSchema = new mongoose.Schema({
     trim: true,
   },
 
+  photo: {
+    type: String,
+  },
+
   phoneNumber: {
     type: String,
     trim: true,
@@ -98,10 +102,6 @@ const userSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-});
-
-userSchema.virtual("fullName").get(function () {
-  return this.firstName + this.lastName;
 });
 
 const User = mongoose.model("User", userSchema);

@@ -1,60 +1,100 @@
+const multer = require("multer");
+const crypto = require("crypto");
+
 const Post = require("../models/postModel");
 const User = require("../models/userModels");
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/img/posts");
+  },
+
+  filename: (req, file, cb) => {
+    // Naming files
+    const extenstion = file.mimetype.split("/")[1];
+    const name = `post-${crypto
+      .randomBytes(16)
+      .toString("hex")}-${Date.now()}.${extenstion}`;
+    cb(null, name);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) cb(null, true);
+  else cb(null, false);
+};
+
+const upload = multer({ storage, fileFilter });
+
+module.exports.upload = upload.single("image");
+
 module.exports.post = async (req, res) => {
-  // Turn into class
-  if (req.body.content.trim() != "") {
-    const new_post = {
-      author: {
-        firstName: req.user.firstName,
-        lastName: req.user.lastName,
-        id: req.user._id,
-      },
-      content: req.body.content,
-      time: new Date(),
-    };
+  try {
+    if (req.body.content.trim() != "") {
+      // Turn into class
+      const new_post = {
+        author: {
+          firstName: req.user.firstName,
+          lastName: req.user.lastName,
+          id: req.user._id,
+        },
 
-    const post = await Post.create(new_post);
-    const user = await User.findOneAndUpdate(
-      { _id: req.user._id },
-      { $push: { posts: post._id } }
-    );
+        content: req.body.content,
+        time: new Date(),
+      };
+
+      if (req.file) new_post.image = req.file.filename;
+
+      const post = await Post.create(new_post);
+      const user = await User.findOneAndUpdate(
+        { _id: req.user._id },
+        { $push: { posts: post._id } }
+      );
+    }
+    res.redirect("/");
+  } catch {
+    res.status(404).send("Error: 404");
   }
-
-  res.redirect("/");
 };
 
 module.exports.comment = async (req, res, next) => {
   //
-  if (req.body.text.trim() == "") return res.redirect("/");
+  try {
+    if (req.body.text.trim() == "") return res.redirect("/");
 
-  // Turn into class
-  const new_comment = {
-    author: {
-      id: req.user._id,
-      firstName: req.user.firstName,
-      lastName: req.user.lastName,
-    },
-    text: req.body.text,
-  };
+    // Turn into class
+    const new_comment = {
+      author: {
+        id: req.user._id,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+      },
+      text: req.body.text,
+    };
 
-  await Post.findOneAndUpdate(
-    { _id: req.params.post },
-    { $push: { comments: new_comment } }
-  );
+    await Post.findOneAndUpdate(
+      { _id: req.params.post },
+      { $push: { comments: new_comment } }
+    );
 
-  res.redirect("/");
+    res.redirect("/");
+  } catch {
+    res.status(404).send("Error: 404");
+  }
 };
 
 module.exports.deletePost = async (req, res) => {
-  console.log(req.user.posts.includes(req.params.post));
-  if (req.user.posts.includes(req.params.post)) {
-    await Post.findOneAndDelete({ _id: req.params.post });
-    await User.findOneAndUpdate(
-      { _id: req.user._id },
-      { $pull: { posts: req.params.post } }
-    );
-  }
+  try {
+    if (req.user.posts.includes(req.params.post)) {
+      await Post.findOneAndDelete({ _id: req.params.post });
+      await User.findOneAndUpdate(
+        { _id: req.user._id },
+        { $pull: { posts: req.params.post } }
+      );
+    }
 
-  return res.redirect("/");
+    return res.redirect("/");
+  } catch {
+    res.status(404).send("Error: 404");
+  }
 };

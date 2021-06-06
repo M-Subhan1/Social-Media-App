@@ -1,4 +1,4 @@
-<form id="profile-form" action="<% if (same) { %>/profile<% } else { %><% if (typeof followed != undefined) { %><% if (followed)  { %>/users/unfollow/<%= user._id %><% } else { %>/users/follow/<%= user._id %>
+<form enctype="multipart/form-data" id="profile-form" action="<% if (same) { %>/profile<% } else { %><% if (typeof followed != undefined) { %><% if (followed)  { %>/users/unfollow/<%= user._id %><% } else { %>/users/follow/<%= user._id %>
 <% }}} %>" 
         method="POST">
 
@@ -10,10 +10,18 @@
             <div class="account-settings">
               <div class="user-profile">
                 <div class="user-avatar text-center">
-                  <img
+                  <% if (user.photo) { %>
+                    <img
+                    src="<%=`/img/users/${user.photo}`%>"
+                    alt="Maxwell Admin"
+                    />
+                  <% } else { %>
+                    <img
                     src="https://bootdey.com/img/Content/avatar/avatar7.png"
                     alt="Maxwell Admin"
-                  />
+                    />
+                  <% } %>
+                  
                 </div>
                 <h6 class="user-name mt-1 text-center">
                   <%= user.firstName %> <%= user.lastName %>
@@ -24,8 +32,10 @@
                 <h5>About</h5>
                 <textarea placeholder="Lorem ipsum dolor, sit amet consectetur adipisicing elit. Impedit aliquam totam esse ratione distinctio sint doloribus ducimus voluptatibus. Possimus nulla voluptatum error enim dignissimos optio!" <% if (!same) { %>
                         disabled
-                      <% } %> name="about" class="form-control" rows="7" style="resize: none;"><% if (typeof user.about == 'undefined' || user.about.trim() == '') {%><% } else {%><%=user.about%><% } %></textarea>
+                      <% } %> name="about" class="form-control" rows="7" style="resize: none;"><% if (typeof user.about == 'undefined' || user.about == '') {%><% } else {%><%=user.about%><% } %></textarea>
                 </p>
+                <h6>Upload Photo</h6>
+                <input type="file" name="image"></input>
               </div>
             </div>
           </div>

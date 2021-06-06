@@ -33,7 +33,7 @@ app.use(flash());
 if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 // Parsing Request data
 app.use(express.json());
-app.use(express.urlencoded({ entended: true }));
+app.use(express.urlencoded({ extended: true }));
 // Setting and confuguring view engine
 app.set("layout", "./layouts/layout");
 app.use(expressLayouts);
