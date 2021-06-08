@@ -35,6 +35,13 @@
             <a class="h6" href="<%=`/users/profile/${comment.author.id}`%>"
               ><%=comment.author.firstName%> <%= comment.author.lastName%></a
             >
+            <% if (user._id == post.author.id) { %>
+            <a
+              href="<%=`posts/comments/delete/${comment._id}`%>"
+              class="small text-red delete-post"
+              ><i class="fas fa-trash-alt"></i
+            ></a>
+            <% } %>
             <p class="comment-content"><%=comment.text%></p>
             <% }); %>
           </div>

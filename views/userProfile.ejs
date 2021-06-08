@@ -37,7 +37,7 @@
                 <% if (same) { %>
                   <h6>Upload Photo</h6>
                   <input type="file" name="image"></input>
-                <% } %>>
+                <% } %>
               </div>
             </div>
           </div>
@@ -51,7 +51,7 @@
                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                   <h6 class="mb-2 text-primary">Personal Details</h6>
                 </div>
-                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                <div class="col-sm-4">
                   <div class="form-group">
                     <label for="profile-firstName">First Name</label>
                     <input
@@ -67,7 +67,7 @@
                     />
                   </div>
                 </div>
-                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                <div class="col-sm-4">
                   <div class="form-group">
                     <label for="profile-lastName">Last Name</label>
                     <input
@@ -80,6 +80,20 @@
                       <% if (!same) { %>
                         disabled
                       <% } %>
+                    />
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <label for="profile-gender">Gender</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="profile-gender"
+                      placeholder="Gender"
+                      name="lastName"
+                      value="<%= user.gender %>"
+                      disabled
                     />
                   </div>
                 </div>
@@ -115,6 +129,7 @@
                   </div>
                 </div>
               </div>
+
               <div class="row gutters">
                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                   <h6 class="mt-3 mb-2 text-primary">Address</h6>

@@ -29,7 +29,7 @@
     <div class="col-12 mb-3">
       <div class="post-content">
         <div class="post-container">
-          <div class="px-5 pt-5">
+          <div class="px-lg-5 pt-lg-5">
             <div class="user-info">
               <h5 class="">
                 <a
@@ -43,8 +43,8 @@
                 <a
                   href="<%=`posts/delete/${post._id}`%>"
                   class="small text-red delete-post"
-                  >delete</a
-                >
+                  ><i class="fas fa-trash-alt"></i
+                ></a>
                 <% } %>
               </h5>
             </div>
@@ -58,8 +58,15 @@
             <div class="post-content"></div>
             <% post.comments.forEach(function(comment) {%>
             <a class="h6" href="<%=`/users/profile/${comment.author.id}`%>"
-              ><%=comment.author.firstName%> <%= comment.author.lastName%></a
-            >
+              ><%=comment.author.firstName%> <%= comment.author.lastName%>
+            </a>
+            <% if (user._id == post.author.id) { %>
+            <a
+              href="<%=`posts/comments/delete/${comment._id}`%>"
+              class="small text-red delete-post"
+              ><i class="fas fa-trash-alt"></i
+            ></a>
+            <% } %>
             <p class="comment-content"><%=comment.text%></p>
             <% }); %>
           </div>
@@ -67,7 +74,7 @@
             <div>
               <div class="mb-3">
                 <form method="POST" action="<%= `/posts/comment/${post._id}`%>">
-                  <div class="input-group pl-5 pr-5">
+                  <div class="input-group px-lg-5">
                     <textarea
                       class="form-control custom-control"
                       rows="2"

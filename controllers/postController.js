@@ -60,7 +60,8 @@ module.exports.post = async (req, res) => {
 module.exports.comment = async (req, res, next) => {
   //
   try {
-    if (req.body.text.trim() == "") return res.redirect("/");
+    const text = req.body.text.trim();
+    if (text == "") return res.redirect("/");
 
     // Turn into class
     const new_comment = {
@@ -69,7 +70,7 @@ module.exports.comment = async (req, res, next) => {
         firstName: req.user.firstName,
         lastName: req.user.lastName,
       },
-      text: req.body.text,
+      text,
     };
 
     await Post.findOneAndUpdate(
@@ -94,6 +95,34 @@ module.exports.deletePost = async (req, res) => {
     }
 
     return res.redirect("/");
+  } catch {
+    res.status(404).send("Error: 404");
+  }
+};
+
+module.exports.deleteComment = async (req, res) => {
+  try {
+    let comment;
+    const posts = await Post.find({ "author.id": req.user.id });
+    const filteredPost = posts.find(post => {
+      comment = post.comments.find(
+        comment => comment._id.valueOf() == req.params.comment
+      );
+      if (comment) return true;
+    });
+
+    console.log(comment);
+
+    await Post.findOneAndUpdate(
+      { _id: filteredPost._id },
+      {
+        $pull: {
+          comments: comment,
+        },
+      }
+    );
+
+    res.redirect("/");
   } catch {
     res.status(404).send("Error: 404");
   }
