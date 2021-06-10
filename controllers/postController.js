@@ -111,16 +111,11 @@ module.exports.deleteComment = async (req, res) => {
       if (comment) return true;
     });
 
-    console.log(comment);
-
-    await Post.findOneAndUpdate(
-      { _id: filteredPost._id },
-      {
-        $pull: {
-          comments: comment,
-        },
-      }
-    );
+    await Post.findByIdAndUpdate(filteredPost._id, {
+      $pull: {
+        comments: comment,
+      },
+    });
 
     res.redirect("/");
   } catch {

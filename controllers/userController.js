@@ -14,13 +14,10 @@ module.exports.findUsers = async (req, res, next) => {
       .split(" ")
       .map(el => el[0].toUpperCase() + el.slice(1));
 
-    query.push(req.body.query);
     // const queryString = query.join(" ");
     const users = await User.find({
       $or: [{ email: query }, { firstName: query }, { lastName: query }],
     });
-
-    console.log(users);
 
     res.render("searchResults", {
       layout: "layouts/dashboardLayout.ejs",
@@ -34,20 +31,23 @@ module.exports.findUsers = async (req, res, next) => {
 // follow user
 module.exports.follow = async (req, res) => {
   try {
-    // if trying to follow myself, redirect
+    // if users tries to follow itself, redirect
     if (req.user._id.toString() == req.params.id) return res.redirect("/");
-    // the user who followed'
+
+    // finding the user that was requested to be followed
     const user = await User.find({ _id: req.params.id });
 
+    // if user does not exist redirect
     if (typeof user == "undefined") return res.redirect("/");
 
+    // checking if the user making the request has already followed the other user
     const match = req.user.following.filter(id => {
       return req.user.following == req.params.id;
     });
 
-    console.log(match);
-
+    // if not already following, follow (update the following array for the one making the request, followed array for the user requested to be followed)
     if (match.length == 0) {
+      // Upadting The user making follow request
       await User.updateOne(
         { _id: req.user._id },
         {
@@ -62,11 +62,12 @@ module.exports.follow = async (req, res) => {
           $push: { followers: req.user._id },
         }
       );
-      console.log("success");
     }
 
+    // On success redirecting to dashboard
     res.redirect("/");
   } catch {
+    // Sending error 404
     res.status(404).send("Error: 404");
   }
 };
@@ -75,6 +76,7 @@ module.exports.unfollow = async (req, res) => {
   try {
     if (req.user._id.toString() == req.params.id) return res.redirect("/");
 
+    // Updating the user that unfollowed
     await User.updateOne(
       { _id: req.user._id },
       {
@@ -82,6 +84,7 @@ module.exports.unfollow = async (req, res) => {
       }
     );
 
+    // Updating the user that got unfollowed
     await User.updateOne(
       { _id: req.params.id },
       {
@@ -89,8 +92,10 @@ module.exports.unfollow = async (req, res) => {
       }
     );
 
+    // Redirecting to dashboard on success
     res.redirect("/");
   } catch {
+    // Sending error 404
     res.status(404).send("Error: 404");
   }
 };
@@ -108,6 +113,7 @@ module.exports.profile = async (req, res) => {
       followed: req.user.following.includes(user.id.toString()),
     });
   } catch {
+    // Sending error 404
     res.status(404).send("Error: 404");
   }
 };

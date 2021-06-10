@@ -5,6 +5,7 @@ const nodemailer = require("nodemailer");
 const LocalStrategy = require("passport-local").Strategy;
 const User = require("../models/userModels");
 
+const Email = require("../Classes/Email");
 // Configuring transporter for nodemailer
 const transporter = nodemailer.createTransport({
   service: "hotmail",
@@ -102,20 +103,17 @@ module.exports.signup = async (req, res) => {
     // Creating the user if there are no errors
     const new_user = await User.create(create_user);
     const domain = process.env.DOMAIN || "localhost:5000/";
-    // Turn into a class
-    const emailConfig = {
-      from: `${process.env.EMAIL}`,
-      to: `${create_user.email}`,
-      subject: "Verify Email Address",
-      text: `Hi ${create_user.firstName} ${create_user.lastName}, welcome to the community from the developers!!
-          Paste the following link in your browser to verify your account: ${domain}validate/${create_user.tokenString}`,
-    };
 
-    transporter.sendMail(emailConfig, function (error, info) {
-      if (error) {
-        console.log(error);
-      }
-    });
+    // Turn into a class
+    const email = new Email(
+      `${process.env.EMAIL}`,
+      `${create_user.email}`,
+      "Verify Email Address",
+      `Hi ${create_user.firstName} ${create_user.lastName}, welcome to the community from the developers!!
+          Paste the following link in your browser to verify your account: ${domain}validate/${create_user.tokenString}`
+    );
+
+    transporter.sendMail(email);
 
     // Add redirect to login page
     req.flash("message", "Account created!! Verify your email to login");
@@ -123,38 +121,6 @@ module.exports.signup = async (req, res) => {
   } catch (err) {
     res.status(404).send("Error: 404");
   }
-};
-// Password Configuration
-module.exports.configure = passport => {
-  const authenticateUser = async (email, password, done) => {
-    try {
-      const user = await User.findOne({ email: email });
-
-      if (user == null)
-        return done(null, false, {
-          message: "Email not registered for a user",
-        });
-
-      if (!user.isVerified)
-        return done(null, false, {
-          message: "Kindly verify your email address",
-        });
-
-      if (await bcrypt.compare(password, user.password))
-        return done(null, user, { message: "Logged in!!" });
-
-      return done(null, false, { message: "Password incorrect!!" });
-    } catch (err) {
-      return done(err);
-    }
-  };
-
-  passport.use(new LocalStrategy({ usernameField: "email" }, authenticateUser));
-  passport.serializeUser((user, done) => done(null, user.email));
-  passport.deserializeUser(async (id, done) => {
-    user = await User.findOne({ email: id });
-    return done(null, user);
-  });
 };
 // Logs the user out
 module.exports.logOut = (req, res) => {
@@ -225,51 +191,83 @@ module.exports.reset = async (req, res) => {
   try {
     let err = [];
 
-    const user = await User.findOne({ email: req.body.email });
-    const token = uniqueString();
+    const user = await User.findOne(new Object({ email: req.body.email }));
 
+    // Checking if user exists (if not add error to the err array and render on the reset menu)
     if (user == null) {
       err.push({ message: "No user exists for the email" });
-      return res.render("reset", { title: "Password Reset", err });
+      return res.render("reset", new Object({ title: "Password Reset", err }));
     }
 
+    // Checking if the user is verified
     if (!user.isVerified) {
-      err.push({
-        message: "User has to be verified before you can reset password!!",
-      });
+      err.push(
+        new Object({
+          message: "User has to be verified before you can reset password!!",
+        })
+      );
 
-      return res.render("reset", { title: "Password Reset", err });
+      return res.render("reset", new Object({ title: "Password Reset", err }));
     }
 
+    // Generating and setting new tokenString and validity to true
+    const token = uniqueString();
     await User.updateOne(
-      { email: req.body.email },
-      {
+      new Object({ email: req.body.email }),
+      new Object({
         $set: { tokenTime: new Date(), tokenString: token, tokenIsValid: true },
-      }
+      })
     );
 
+    // Setting up email object
     const domain = process.env.DOMAIN || "localhost:5000/";
-    // turn into a class
-    const emailConfig = {
-      from: `${process.env.EMAIL}`,
-      to: `${user.email}`,
-      subject: "Reset Password",
-      text: `Hi ${user.firstName} ${user.lastName}, your (or someone else) has requested password reset for this account!!
-          Paste the following link in your browser to reset your password: ${domain}reset/${token}`,
-    };
+    const email = new Email(
+      `${process.env.EMAIL}`,
+      `${user.email}`,
+      "Reset Password",
+      `Hi ${user.firstName} ${user.lastName}, your (or someone else) has requested password reset for this account!!
+      Paste the following link in your browser to reset your password: ${domain}reset/${token}`
+    );
 
-    transporter.sendMail(emailConfig, function (error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log("Message sent: " + info.message);
-        console.log("Preview: " + nodemailer.getTestMessageUrl(info));
-      }
-    });
-
+    // Sending email and redirecting to login
+    transporter.sendMail(email);
     req.flash("message", "Check your email for password reset instructions");
     res.redirect("/login");
+    //
   } catch {
     res.status(404).send("Error: 404");
   }
+};
+// Password Configuration
+module.exports.configure = passport => {
+  // Middleware to help verify
+  const authenticateUser = async (email, password, done) => {
+    try {
+      const user = await User.findOne({ email: email });
+
+      if (user == null)
+        return done(null, false, {
+          message: "Email not registered for a user",
+        });
+
+      if (!user.isVerified)
+        return done(null, false, {
+          message: "Kindly verify your email address",
+        });
+
+      if (await bcrypt.compare(password, user.password))
+        return done(null, user, { message: "Logged in!!" });
+
+      return done(null, false, { message: "Password incorrect!!" });
+    } catch (err) {
+      return done(err);
+    }
+  };
+
+  passport.use(new LocalStrategy({ usernameField: "email" }, authenticateUser));
+  passport.serializeUser((user, done) => done(null, user.email));
+  passport.deserializeUser(async (id, done) => {
+    user = await User.findOne({ email: id });
+    return done(null, user);
+  });
 };
