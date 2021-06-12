@@ -7,6 +7,6 @@ module.exports = class Posts extends Comments {
     // extending data members for posts
     this.time = new Date();
     this.comments = [];
-    this.image = null;
+    this.image = "";
   }
 };

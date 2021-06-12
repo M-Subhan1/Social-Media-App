@@ -22,10 +22,10 @@ module.exports.findUsers = async (req, res, next) => {
     const config = new Object({
       layout: "layouts/dashboardLayout.ejs",
       title: "Proj",
-      users: users,
+      users,
     });
 
-    res.render("searchResults");
+    res.render("searchResults", config);
   } catch {
     res.status(404).send("Error: 404");
   }

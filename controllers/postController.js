@@ -5,7 +5,7 @@ const Post = require("../models/postModel");
 const User = require("../models/userModels");
 // Classes
 const NewPost = require("../Classes/Posts");
-const NewComment = require("../Classes/Comments");
+const Comment = require("../Classes/Comments");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -66,12 +66,14 @@ module.exports.comment = async (req, res, next) => {
     if (content == "") return res.redirect("/");
 
     // Creating Comment Object
-    const new_comment = NewComment(
+    const new_comment = new Comment(
       req.user.firstName,
       req.user.lastName,
       req.user._id,
       content
     );
+
+    console.log(new_comment);
 
     await Post.findOneAndUpdate(
       { _id: req.params.post },
