@@ -7,8 +7,8 @@ const LocalStrategy = require("passport-local").Strategy;
 const User = require("../models/userModels");
 // Classes
 const Email = require("../Classes/Email");
-const UserTemplate = require("../Classes/User");
 const Message = require("../Classes/Message");
+const NewUsers = require("../Classes/User");
 // Configuring transporter for nodemailer
 const transporter = nodemailer.createTransport(
   new Object({
@@ -72,11 +72,14 @@ module.exports.signup = async (req, res) => {
     if (user != null && user.isVerified == true)
       err.push(new Message("Email registered with another user!"));
 
+    if (user != null && user.isVerified == false)
+      await User.deleteOne({ email: req.body.email });
+
     const salt = await bcrypt.genSalt();
     const hashed_password = await bcrypt.hash(req.body.password, salt);
 
     // creating users
-    const create_user = new UserTemplate(
+    const create_user = new NewUsers(
       req.body.firstName,
       req.body.lastName,
       req.body.gender,
@@ -102,7 +105,7 @@ module.exports.signup = async (req, res) => {
     }
 
     // Storing the user into the database if there are no errors
-    // const new_user = await User.create(create_user);
+    const new_user = await User.create(create_user);
     const domain = process.env.DOMAIN;
 
     // Turn into a class
