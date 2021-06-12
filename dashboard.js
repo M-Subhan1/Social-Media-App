@@ -40,7 +40,7 @@ module.exports.profile = async (req, res) => {
 module.exports.updateProfile = async (req, res) => {
   console.log(req.file);
   try {
-    const user = Object.create({
+    const user_properties = new Object({
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       phoneNumber: req.body.phoneNumber,
@@ -58,7 +58,7 @@ module.exports.updateProfile = async (req, res) => {
     await User.findOneAndUpdate(
       { _id: req.user._id },
       {
-        $set: user,
+        $set: user_properties,
       }
     );
     // Updating username in posts
@@ -104,14 +104,17 @@ module.exports.populate = async (req, res) => {
     });
 
     queryObj.push({ "author.id": req.user._id });
-    // Apply filter for last 1 day
-    const time = new Date();
-    const posts = await Post.find({ $or: queryObj });
+
+    // Filtering posts
+    const time = new Date(); // current time obj
+    const posts = await Post.find({ $or: queryObj }); // posts
     const filteredPosts = posts.filter(post => {
       return time.getTime() - post.time.getTime() < 259200000;
     });
+
     // Sorting posts by time (most recent first)
     filteredPosts.sort((a, b) => b.time.getTime() - a.time.getTime());
+
     // Rendering webpage
     return res.render("dashboard", {
       user: req.user,

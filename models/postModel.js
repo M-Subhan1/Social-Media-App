@@ -19,7 +19,7 @@ const commentSchema = new mongoose.Schema({
     },
   },
 
-  text: {
+  content: {
     type: String,
     required: [true, "Comments must have content"],
     trim: true,

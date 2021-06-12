@@ -51,7 +51,7 @@
 
             <div class="post-text mb-2">
               <p><%= post.content%></p>
-              <% if (typeof post.image != 'undefined' || post.image) {%>
+              <% if (post.image != '') {%>
               <img class="post-image" src="<%=`img/posts/${post.image}`%>" />
               <% } %>
             </div>
@@ -67,7 +67,7 @@
               ><i class="fas fa-trash-alt"></i
             ></a>
             <% } %>
-            <p class="comment-content"><%=comment.text%></p>
+            <p class="comment-content"><%=comment.content%></p>
             <% }); %>
           </div>
           <div class="">

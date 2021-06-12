@@ -1,21 +1,26 @@
+// Importing Packages
 const bcrypt = require("bcryptjs");
 const uniqueString = require("unique-string");
 const nodemailer = require("nodemailer");
-
 const LocalStrategy = require("passport-local").Strategy;
+// Localc Modules
 const User = require("../models/userModels");
-
+// Classes
 const Email = require("../Classes/Email");
+const UserTemplate = require("../Classes/User");
+const Message = require("../Classes/Message");
 // Configuring transporter for nodemailer
-const transporter = nodemailer.createTransport({
-  service: "hotmail",
-  auth: {
-    user: process.env.EMAIL,
-    pass: process.env.EMAIL_PASSWORD,
-  },
-});
+const transporter = nodemailer.createTransport(
+  new Object({
+    service: "hotmail",
+    auth: {
+      user: process.env.EMAIL,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  })
+);
 
-// Checks if the token string is valid
+// Checks if the token string is valid, if not redirects to /login
 module.exports.isValidToken = async (req, res, next) => {
   try {
     const user = await User.findOne({ tokenString: req.params.token });
@@ -29,7 +34,7 @@ module.exports.isValidToken = async (req, res, next) => {
     res.status(404).send("Error: 404");
   }
 };
-// Checks if the user is logged out, else redirects to login
+// Checks if the user is logged out, else redirects to /login
 module.exports.isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) return next();
   res.redirect(301, "/login");
@@ -52,44 +57,38 @@ module.exports.signup = async (req, res) => {
       !req.body.email ||
       !req.body.gender
     )
-      err.push({ message: "Kindly fill in all the fields" });
+      err.push(new Message("Kindly fill in all the fields"));
 
     if (req.body.password.length < 6)
-      err.push({ message: "Password must be greater than 6 characters" });
+      err.push(new Message("Password must be greater than 6 characters"));
 
     if (req.body.password != req.body.password2)
-      err.push({ message: "Passwords do not match!" });
+      err.push(new Message("Passwords do not match!"));
 
     const user = await User.findOne({
       email: req.body.email,
     });
 
     if (user != null && user.isVerified == true)
-      err.push({ message: "Email registered with another user!" });
+      err.push(new Message("Email registered with another user!"));
 
     const salt = await bcrypt.genSalt();
     const hashed_password = await bcrypt.hash(req.body.password, salt);
 
-    // Turn into a class
-    const create_user = {
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      password: hashed_password,
-      email: req.body.email,
-      isVerified: false,
-      tokenString: uniqueString(),
-      tokenTime: new Date(),
-      tokenIsValid: true,
-      following: [],
-      followers: [],
-      posts: [],
-      gender: req.body.gender,
-      dateJoined: new Date(),
-    };
+    // creating users
+    const create_user = new UserTemplate(
+      req.body.firstName,
+      req.body.lastName,
+      req.body.gender,
+      req.body.email,
+      hashed_password
+    );
 
-    // If errors exist, prompting for input again // Fix thiss
+    console.log(create_user);
+    // If errors exist, prompting for input again
     if (err.length > 0) {
-      return res.render("register", {
+      // Setting up Config Object
+      const config = new Object({
         title: "Register",
         err,
         firstName: req.body.firstName,
@@ -98,11 +97,13 @@ module.exports.signup = async (req, res) => {
         password: req.body.password,
         password2: req.body.password2,
       });
+
+      return res.render("register", config);
     }
 
-    // Creating the user if there are no errors
-    const new_user = await User.create(create_user);
-    const domain = process.env.DOMAIN || "localhost:5000/";
+    // Storing the user into the database if there are no errors
+    // const new_user = await User.create(create_user);
+    const domain = process.env.DOMAIN;
 
     // Turn into a class
     const email = new Email(
@@ -114,18 +115,20 @@ module.exports.signup = async (req, res) => {
     );
 
     transporter.sendMail(email);
-
     // Add redirect to login page
     req.flash("message", "Account created!! Verify your email to login");
     res.redirect(301, "/login");
+    //
   } catch (err) {
     res.status(404).send("Error: 404");
   }
 };
 // Logs the user out
 module.exports.logOut = (req, res) => {
+  // Clears the cookie from Passport, effectively logging the user out
   req.logout();
   req.flash("message", "Successfully Logged Out!!");
+  // Redirecting to Login page
   return res.redirect("/login");
 };
 // Validates login
@@ -144,18 +147,24 @@ module.exports.validateUser = async (req, res) => {
       { $set: { isVerified: true, tokenIsValid: false } }
     );
 
+    // Storing Flash message and Redirecting to the Login, Page
     req.flash("message", "Account Verified!! You can now login");
     return res.redirect("/login");
+    //
   } catch {}
 };
 // Renders the Password Prompt webpage
 module.exports.setNewPassword = async (req, res) => {
   try {
-    res.render("setPassword", {
+    // Config Obj
+    const config = new Object({
       title: "Password Reset",
       url: `/password/${req.params.token}`,
       warning: req.flash("warning"),
     });
+    // rendering the page
+    res.render("setPassword", config);
+    //
   } catch {
     res.status(404).send("Error: 404");
   }
@@ -163,25 +172,32 @@ module.exports.setNewPassword = async (req, res) => {
 // Validates and stores password update
 module.exports.updatePassword = async (req, res) => {
   try {
+    // If both passwords do not match, rendering the reset page again
     if (req.body.password != req.body.password2) {
       req.flash("warning", "Both passwords must match!!");
       return res.redirect(`/reset/${req.params.token}`);
     }
 
+    // If password length less than 6 rendering the page again
     if (req.body.password.length < 6) {
       req.flash("warning", "Password must be greater than 6 characters");
       return res.redirect(`/reset/${req.params.token}`);
     }
 
+    // Generating encrypted password
     const salt = await bcrypt.genSalt();
     const hashed_password = await bcrypt.hash(req.body.password, salt);
+
+    // Updating the Password
     await User.updateOne(
       { tokenString: req.params.token.trim() },
       { $set: { password: hashed_password, tokenIsValid: true } }
     );
 
+    // Notifying the user of the change and redirecting to login
     req.flash("message", "Password updated!!");
     return res.redirect("/login");
+    //
   } catch {
     res.status(404).send("Error: 404");
   }
@@ -195,16 +211,16 @@ module.exports.reset = async (req, res) => {
 
     // Checking if user exists (if not add error to the err array and render on the reset menu)
     if (user == null) {
-      err.push({ message: "No user exists for the email" });
+      err.push(new Message("No user exists for the email"));
       return res.render("reset", new Object({ title: "Password Reset", err }));
     }
 
     // Checking if the user is verified
     if (!user.isVerified) {
       err.push(
-        new Object({
-          message: "User has to be verified before you can reset password!!",
-        })
+        new Object(
+          new Message("User has to be verified before you can reset password!!")
+        )
       );
 
       return res.render("reset", new Object({ title: "Password Reset", err }));
@@ -244,21 +260,29 @@ module.exports.configure = passport => {
   const authenticateUser = async (email, password, done) => {
     try {
       const user = await User.findOne({ email: email });
-
+      // If no user found, user does not exist
       if (user == null)
-        return done(null, false, {
-          message: "Email not registered for a user",
-        });
+        return done(
+          null,
+          false,
+          new Message("Email not registered for a user")
+        );
 
+      // If user found but is not verified, does not allow login
       if (!user.isVerified)
-        return done(null, false, {
-          message: "Kindly verify your email address",
-        });
+        return done(
+          null,
+          false,
+          new Message("Kindly verify your email address")
+        );
 
+      // IF user exists and passwords match, user is logged in and cookie stored in passport
       if (await bcrypt.compare(password, user.password))
-        return done(null, user, { message: "Logged in!!" });
+        return done(null, user, new Message("Logged in!!"));
 
-      return done(null, false, { message: "Password incorrect!!" });
+      // If not, passwords do not match
+      return done(null, false, new Message("Password incorrect!!"));
+      //
     } catch (err) {
       return done(err);
     }

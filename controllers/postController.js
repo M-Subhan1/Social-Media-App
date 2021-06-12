@@ -3,6 +3,9 @@ const crypto = require("crypto");
 
 const Post = require("../models/postModel");
 const User = require("../models/userModels");
+// Classes
+const NewPost = require("../Classes/Posts");
+const NewComment = require("../Classes/Comments");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -32,26 +35,25 @@ module.exports.post = async (req, res) => {
   try {
     if (req.body.content.trim() != "") {
       // Turn into class
-      const new_post = {
-        author: {
-          firstName: req.user.firstName,
-          lastName: req.user.lastName,
-          id: req.user._id,
-        },
+      const new_post = new NewPost(
+        req.user.firstName,
+        req.user.lastName,
+        req.user._id,
+        req.body.content
+      );
 
-        content: req.body.content,
-        time: new Date(),
-      };
-
+      // If Image exists, adding an image property
       if (req.file) new_post.image = req.file.filename;
-
+      // Saving post to the Database and updating user.posts array
       const post = await Post.create(new_post);
       const user = await User.findOneAndUpdate(
         { _id: req.user._id },
         { $push: { posts: post._id } }
       );
     }
+    // REdirecting to Dashboard
     res.redirect("/");
+    //
   } catch {
     res.status(404).send("Error: 404");
   }
@@ -60,18 +62,16 @@ module.exports.post = async (req, res) => {
 module.exports.comment = async (req, res, next) => {
   //
   try {
-    const text = req.body.text.trim();
-    if (text == "") return res.redirect("/");
+    const content = req.body.text.trim();
+    if (content == "") return res.redirect("/");
 
-    // Turn into class
-    const new_comment = {
-      author: {
-        id: req.user._id,
-        firstName: req.user.firstName,
-        lastName: req.user.lastName,
-      },
-      text,
-    };
+    // Creating Comment Object
+    const new_comment = NewComment(
+      req.user.firstName,
+      req.user.lastName,
+      req.user._id,
+      content
+    );
 
     await Post.findOneAndUpdate(
       { _id: req.params.post },
@@ -103,7 +103,9 @@ module.exports.deletePost = async (req, res) => {
 module.exports.deleteComment = async (req, res) => {
   try {
     let comment;
+    // Finding all the posts for the current user
     const posts = await Post.find({ "author.id": req.user.id });
+    // Finding the post with the required comment
     const filteredPost = posts.find(post => {
       comment = post.comments.find(
         comment => comment._id.valueOf() == req.params.comment
@@ -111,13 +113,15 @@ module.exports.deleteComment = async (req, res) => {
       if (comment) return true;
     });
 
+    // Updating the Database (removing comment)
     await Post.findByIdAndUpdate(filteredPost._id, {
       $pull: {
         comments: comment,
       },
     });
-
+    // Redirecting to dashboard
     res.redirect("/");
+    //
   } catch {
     res.status(404).send("Error: 404");
   }

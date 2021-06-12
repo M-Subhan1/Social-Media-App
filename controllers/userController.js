@@ -19,11 +19,13 @@ module.exports.findUsers = async (req, res, next) => {
       $or: [{ email: query }, { firstName: query }, { lastName: query }],
     });
 
-    res.render("searchResults", {
+    const config = new Object({
       layout: "layouts/dashboardLayout.ejs",
       title: "Proj",
       users: users,
     });
+
+    res.render("searchResults");
   } catch {
     res.status(404).send("Error: 404");
   }
@@ -55,7 +57,7 @@ module.exports.follow = async (req, res) => {
         }
       );
 
-      // // the user who got followed
+      // Updating the user who got followed
       await User.updateOne(
         { _id: req.params.id },
         {
