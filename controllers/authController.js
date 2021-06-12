@@ -245,7 +245,7 @@ module.exports.reset = async (req, res) => {
       `${user.email}`,
       "Reset Password",
       `Hi ${user.firstName} ${user.lastName}, your (or someone else) has requested password reset for this account!!
-      Paste the following link in your browser to reset your password: ${domain}reset/${token}`
+      Paste the following link in your browser to reset your password: ${domain}reset/${token}. The Link will expire in an hour`
     );
 
     // Sending email and redirecting to login
