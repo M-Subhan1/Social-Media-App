@@ -39,7 +39,7 @@ module.exports.isValidToken = async (req, res, next) => {
 module.exports.isLoggedIn = (req, res, next) => {
   // If user is authenticated, allowing connection
   if (req.isAuthenticated()) return next();
-  // Redirecting to ogin page if the user isnt logged in
+  // Redirecting to login page if the user isnt logged in
   res.redirect(301, "/login");
 };
 // Checks if the user is logged out, else redirects to /
@@ -268,7 +268,7 @@ module.exports.reset = async (req, res) => {
     res.status(404).send("Error: 404");
   }
 };
-// Password Configuration
+// Passport Configuration
 module.exports.configure = passport => {
   // Middleware to help verify
   const authenticateUser = async (email, password, done) => {

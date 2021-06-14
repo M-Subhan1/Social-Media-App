@@ -399,3 +399,7 @@ img {
 .search-results {
   background-color: #ffffff;
 }
+
+.title-span {
+  width: 100px;
+}
