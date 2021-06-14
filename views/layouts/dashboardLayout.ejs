@@ -7,6 +7,12 @@
     <!--========== BOX ICONS ==========-->
     <link
       rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+      integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css"
     />
     <link
@@ -15,14 +21,14 @@
     />
     <!--========== CSS ==========-->
     <link rel="stylesheet" href="/css/dashboard.css" />
-
+    <link href="css/post.css" rel="stylesheet" />
     <title>Inkit</title>
   </head>
   <body>
     <!--========== HEADER ==========-->
     <header class="header">
       <div class="header__container">
-        <a href="#" class="header__logo">Inkit</a>
+        <a href="#" class="header__logo title-span">Inkit</a>
         <form method="POST" action="/users/find">
           <div class="header__search">
             <input
@@ -49,7 +55,7 @@
         <div>
           <a href="/" class="nav__link nav__logo">
             <i class="bx bxs-disc nav__icon"></i>
-            <span class="nav__logo-name title-span">Inkit</span>
+            <span class="nav__logo-name">Placeholder</span>
           </a>
 
           <div class="nav__list">
@@ -100,8 +106,24 @@
                 id="btn-nav"
                 class="nav__link btn-primary"
               >
-                <i class="bx bx-btns bx-message-rounded nav__icon"></i>
+                <i class="bx bx-btns bx-message nav__icon"></i>
                 <span class="nav__name">My Posts</span>
+              </button>
+
+              <form
+                id="messages"
+                method="GET"
+                action="/messages"
+                style="display: none"
+              ></form>
+              <button
+                type="submit"
+                form="messages"
+                id="btn-nav"
+                class="nav__link btn-primary"
+              >
+                <i class="bx bx-btns bx-message-rounded nav__icon"></i>
+                <span class="nav__name">Messages</span>
               </button>
             </div>
           </div>
