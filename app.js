@@ -1,3 +1,4 @@
+// npm modules
 const express = require("express");
 const morgan = require("morgan");
 const expressLayouts = require("express-ejs-layouts");
@@ -5,7 +6,7 @@ const passport = require("passport");
 const flash = require("express-flash");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
-
+// Local modules
 const authentication = require("./controllers/authController");
 const userRouter = require("./routes/users");
 const postRouter = require("./routes/posts");

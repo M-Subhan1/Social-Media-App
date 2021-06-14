@@ -23,8 +23,9 @@ const transporter = nodemailer.createTransport(
 // Checks if the token string is valid, if not redirects to /login
 module.exports.isValidToken = async (req, res, next) => {
   try {
+    // Retrieving user object from the database
     const user = await User.findOne({ tokenString: req.params.token });
-
+    // If no user exists, redirecting to login
     if (user == null || !user.tokenIsValid) {
       req.flash("info", "The link has expired!!");
       return res.redirect(301, "/login");
@@ -36,19 +37,24 @@ module.exports.isValidToken = async (req, res, next) => {
 };
 // Checks if the user is logged out, else redirects to /login
 module.exports.isLoggedIn = (req, res, next) => {
+  // If user is authenticated, allowing connection
   if (req.isAuthenticated()) return next();
+  // Redirecting to ogin page if the user isnt logged in
   res.redirect(301, "/login");
 };
 // Checks if the user is logged out, else redirects to /
 module.exports.isLoggedOut = (req, res, next) => {
+  // If user is logged out, calling the next middleware
   if (!req.isAuthenticated()) return next();
+  // Redirecting to dashboard otherwise
   res.redirect(301, "/", { name: req.user.firstName });
 };
 // Validates data Signups the user
 module.exports.signup = async (req, res) => {
   try {
+    // init an error array
     let err = [];
-
+    // Accumulating errors
     if (
       !req.body.firstName ||
       !req.body.lastName ||
@@ -65,29 +71,23 @@ module.exports.signup = async (req, res) => {
     if (req.body.password != req.body.password2)
       err.push(new Message("Passwords do not match!"));
 
+    // Retrieving user from database
     const user = await User.findOne({
       email: req.body.email,
     });
 
+    // If user exists and is verfied, notifying email already in use
     if (user != null && user.isVerified == true)
       err.push(new Message("Email registered with another user!"));
 
+    // If user exists but isnt verified, allowing profile update
     if (user != null && user.isVerified == false)
       await User.deleteOne({ email: req.body.email });
 
+    // Encyrpting password
     const salt = await bcrypt.genSalt();
     const hashed_password = await bcrypt.hash(req.body.password, salt);
 
-    // creating users
-    const create_user = new NewUsers(
-      req.body.firstName,
-      req.body.lastName,
-      req.body.gender,
-      req.body.email,
-      hashed_password
-    );
-
-    console.log(create_user);
     // If errors exist, prompting for input again
     if (err.length > 0) {
       // Setting up Config Object
@@ -104,11 +104,20 @@ module.exports.signup = async (req, res) => {
       return res.render("register", config);
     }
 
+    // creating user object
+    const create_user = new NewUsers(
+      req.body.firstName,
+      req.body.lastName,
+      req.body.gender,
+      req.body.email,
+      hashed_password
+    );
+
     // Storing the user into the database if there are no errors
     const new_user = await User.create(create_user);
     const domain = process.env.DOMAIN;
 
-    // Turn into a class
+    // Sending email verification email
     const email = new Email(
       `${process.env.EMAIL}`,
       `${create_user.email}`,
@@ -137,14 +146,16 @@ module.exports.logOut = (req, res) => {
 // Validates login
 module.exports.validateUser = async (req, res) => {
   try {
+    // retrieving user from the database
     const user = await User.findOne({ tokenString: req.params.token });
-    const time = new Date();
 
+    // Redirecting if the user is not found
     if (user == null || !user.tokenIsValid || user.isVerified) {
       req.flash("info", "Invalid link");
       return res.redirect("/login");
     }
 
+    // Updating validation properties
     await User.updateOne(
       { email: user.email },
       { $set: { isVerified: true, tokenIsValid: false } }
@@ -291,8 +302,11 @@ module.exports.configure = passport => {
     }
   };
 
+  // Configuring passport with local strategy
   passport.use(new LocalStrategy({ usernameField: "email" }, authenticateUser));
+  // Serializing user (saves the user email and a cookie for future requests)
   passport.serializeUser((user, done) => done(null, user.email));
+  // Deserailizes user (uses the cookie to refer to the email and uses the email to find the user)
   passport.deserializeUser(async (id, done) => {
     user = await User.findOne({ email: id });
     return done(null, user);

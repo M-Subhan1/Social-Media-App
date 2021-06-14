@@ -8,15 +8,14 @@
     </h5>
     <div>
       <% if (!user.about) { %> Lorem ipsum dolor, sit amet consectetur
-      adipisicing elit. Impedit aliquam totam esse ratione distinctio sint
-      doloribus ducimus voluptatibus. <% } else { %><%= user.about%> <% } %>
+      adipisicing elit. Impedit aliquam. <% } else { %><%= user.about%> <% } %>
     </div>
   </div>
   <% }); %> <% if (users.length == 0) { %>
   <div class="p-5 mb-4 search-results">
     <h5 class="text-center">
-      No match found! Try entering First Name, Last Name or email for better
-      reults
+      No match found! Try entering First Name, Last Name or email for more
+      accurate matches
     </h5>
   </div>
   <% }; %>

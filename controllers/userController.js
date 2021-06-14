@@ -19,6 +19,7 @@ module.exports.findUsers = async (req, res, next) => {
       $or: [{ email: query }, { firstName: query }, { lastName: query }],
     });
 
+    // config object for rendering the page
     const config = new Object({
       layout: "layouts/dashboardLayout.ejs",
       title: "Proj",

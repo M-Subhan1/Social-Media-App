@@ -1,12 +1,15 @@
+// Required modules
 const multer = require("multer");
 const crypto = require("crypto");
-
+const fs = require("fs");
+// Database
 const Post = require("../models/postModel");
 const User = require("../models/userModels");
 // Classes
 const NewPost = require("../Classes/Posts");
 const Comment = require("../Classes/Comments");
 
+// Multer Configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "public/img/posts");
@@ -21,7 +24,7 @@ const storage = multer.diskStorage({
     cb(null, name);
   },
 });
-
+// Filters the file type
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image")) cb(null, true);
   else cb(null, false);
@@ -31,10 +34,12 @@ const upload = multer({ storage, fileFilter });
 
 module.exports.upload = upload.single("image");
 
+// Add post
 module.exports.post = async (req, res) => {
   try {
+    // if the post content is not empty, creating a new post
     if (req.body.content.trim() != "") {
-      // Turn into class
+      // creating post object
       const new_post = new NewPost(
         req.user.firstName,
         req.user.lastName,
@@ -51,7 +56,7 @@ module.exports.post = async (req, res) => {
         { $push: { posts: post._id } }
       );
     }
-    // REdirecting to Dashboard
+    // Redirecting to Dashboard
     res.redirect("/");
     //
   } catch {
@@ -59,9 +64,11 @@ module.exports.post = async (req, res) => {
   }
 };
 
+// Add comment
 module.exports.comment = async (req, res, next) => {
   //
   try {
+    // If comment content is empty, redirecting to dashboard
     const content = req.body.text.trim();
     if (content == "") return res.redirect("/");
 
@@ -72,36 +79,47 @@ module.exports.comment = async (req, res, next) => {
       req.user._id,
       content
     );
-
-    console.log(new_comment);
-
+    // Adding comment to the post object
     await Post.findOneAndUpdate(
       { _id: req.params.post },
       { $push: { comments: new_comment } }
     );
-
+    // Rediirecting to dashboard
     res.redirect("/");
   } catch {
     res.status(404).send("Error: 404");
   }
 };
 
+// Delete post
 module.exports.deletePost = async (req, res) => {
   try {
+    // Finding the post from the users' posts
+    let post;
     if (req.user.posts.includes(req.params.post)) {
-      await Post.findOneAndDelete({ _id: req.params.post });
+      // Deleting the post
+      post = await Post.findOneAndDelete({ _id: req.params.post });
+      // Updating users' post property
       await User.findOneAndUpdate(
         { _id: req.user._id },
         { $pull: { posts: req.params.post } }
       );
     }
 
+    // Deleting the post image
+    if (post.image != "")
+      fs.unlink(`${__dirname}/../public/img/posts/${post.image}`, err => {
+        if (err) console.log(err);
+      });
+    // Redirecting to dashboard
     return res.redirect("/");
+    //
   } catch {
     res.status(404).send("Error: 404");
   }
 };
 
+// Delete comment
 module.exports.deleteComment = async (req, res) => {
   try {
     let comment;
